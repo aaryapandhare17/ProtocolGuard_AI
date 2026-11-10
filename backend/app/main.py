@@ -5,6 +5,8 @@ from app.core.config import settings
 from app.database.store import Base, configure
 from app.api.routes import router
 from app.api.fsm import router as fsm_router
+from app.api.risk import router as risk_router
+from app.services.risk import load_detector
 
 
 def create_app(config=None) -> FastAPI:
@@ -14,10 +16,13 @@ def create_app(config=None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app):
         Base.metadata.create_all(engine)
+        app.state.detector, app.state.ml_status = load_detector(config)
         yield
         engine.dispose()
 
     app = FastAPI(title="ProtocolGuard AI", version="0.2.0", lifespan=lifespan)
+    app.state.detector = None
+    app.state.ml_status = "not_initialized"
     app.state.settings = config
     app.state.session_factory = factory
     app.add_middleware(CORSMiddleware, allow_origins=config.cors_origins.split(","),
@@ -25,6 +30,7 @@ def create_app(config=None) -> FastAPI:
         allow_headers=["Content-Type", "Authorization", "X-CSRF-Token"])
     app.include_router(router)
     app.include_router(fsm_router)
+    app.include_router(risk_router)
 
     @app.get("/api/health", tags=["health"])
     def health() -> dict[str, str]:

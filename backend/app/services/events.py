@@ -3,6 +3,7 @@ import json
 from dataclasses import asdict
 from app.fsm.engine import VERSION, step
 from app.models.entities import SecurityEvent
+from app.services.risk import assess_event
 
 
 def record(db, request, kind, user_id=None, session=None, outcome="success", *, banking=True):
@@ -21,4 +22,6 @@ def record(db, request, kind, user_id=None, session=None, outcome="success", *, 
         state_after=after, evidence=json.dumps(metadata))
     db.add(row)
     db.flush()
+    if banking:
+        assess_event(db, request, row, transition)
     return row

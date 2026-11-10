@@ -48,3 +48,22 @@ class SecurityEvent(Base):
     state_after: Mapped[str] = mapped_column(default="LOGGED_OUT")
     evidence: Mapped[str] = mapped_column(Text, default="{}")
     created_at: Mapped[datetime] = mapped_column(default=now, index=True)
+
+
+class DetectionResult(Base):
+    __tablename__ = "detection_results"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    event_id: Mapped[int] = mapped_column(ForeignKey("security_events.id"), unique=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), index=True)
+    evidence: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=now, index=True)
+
+
+class RiskScore(Base):
+    __tablename__ = "risk_scores"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    detection_id: Mapped[int] = mapped_column(ForeignKey("detection_results.id"), unique=True)
+    previous_score: Mapped[float]
+    score: Mapped[float]
+    created_at: Mapped[datetime] = mapped_column(default=now, index=True)

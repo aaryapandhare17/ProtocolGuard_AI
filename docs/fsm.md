@@ -96,8 +96,8 @@ requests still commit their security evidence through the existing database depe
 
 Authentication continues to verify the session, expiry, revocation, role, account status,
 and CSRF token independently. A DFA state can neither grant access nor replace these
-checks. A detected protocol violation currently records evidence; risk scoring and
-automatic blocking will be added later.
+checks. A detected protocol violation records evidence and contributes to the
+[hybrid risk score](hybrid-risk.md). Automatic blocking will be added later.
 
 ## Administrator API
 

@@ -14,7 +14,8 @@ A deterministic banking-session FSM records versioned transitions and violations
 admin-only definition and replay APIs. Reproducible synthetic session generation and a shared
 90-feature ML extractor are implemented.
 Random Forest and Isolation Forest training, saved-model inference, and measured evaluation
-are implemented. Hybrid risk scoring, automated blocking, and live monitoring are planned;
+are implemented. Hybrid risk scoring now runs on banking events with persistent evidence
+and time-based decay. Automatic blocking and live monitoring are planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -125,3 +126,11 @@ explains prefix observations, threshold selection, inference, and measured limit
 The [recorded evaluation](docs/ml-evaluation.json) includes test and held-out results;
 these are synthetic-data measurements, not production accuracy claims.
 ML-specific tests require the `ml` extra; without it those tests are skipped.
+
+## Hybrid risk scoring
+
+Banking events now persist FSM, ML, and behavioral evidence with per-user score histories.
+See [the scoring formula, configuration, and admin APIs](docs/hybrid-risk.md).
+Models load from `ML_MODEL_DIRECTORY` at startup; train them first for full ML coverage.
+If models are unavailable, assessments explicitly show degraded coverage. Scores decay
+while inactive and do not repeatedly add the same evidence. Account blocking is the next feature.

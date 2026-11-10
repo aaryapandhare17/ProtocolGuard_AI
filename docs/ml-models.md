@@ -132,5 +132,6 @@ Isolation output also includes its empirical percentile relative to normal **val
 `anomaly_evidence = clip((percentile - 0.95) / 0.05, 0, 1)` scales just the upper reference tail
 into a bounded evidence value. It does not turn an anomaly score into a probability of attack.
 
-The inference service does not yet change risk scores, block accounts, or expose a prediction
-upload endpoint. Hybrid scoring and backend enforcement are separate upcoming features.
+The inference service now contributes to [hybrid scoring](hybrid-risk.md) through the
+banking event pipeline. Automatic account blocking is the next feature. There is no
+prediction upload endpoint; artifacts are generated and loaded from trusted local storage.

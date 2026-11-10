@@ -12,7 +12,7 @@ from app.database.store import now
 
 @pytest.fixture
 def app(tmp_path):
-    instance = create_app(Settings(database_url=f"sqlite:///{tmp_path}/test.db"))
+    instance = create_app(Settings(database_url=f"sqlite:///{tmp_path}/test.db", ml_enabled=False))
     with TestClient(instance):
         seed(instance.state.session_factory, "bank-test-password", "admin-test-password")
         yield instance
