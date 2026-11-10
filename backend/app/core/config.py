@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./protocolguard.db"
     cors_origins: str = "http://localhost:5173,http://localhost:5174"
 
+    ip_auto_restrict_enabled: bool = True
+    ip_abuse_threshold: int = Field(default=30,ge=5,le=1000)
+    ip_abuse_window_seconds: int = Field(default=60,ge=10,le=3600)
+    ip_restriction_seconds: int = Field(default=120,ge=5,le=86400)
     auto_block_enabled: bool = True
     block_threshold: float = Field(default=60, ge=0, le=100, allow_inf_nan=False)
     ml_enabled: bool = True

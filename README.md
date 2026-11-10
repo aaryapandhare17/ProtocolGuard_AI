@@ -17,7 +17,8 @@ Random Forest and Isolation Forest training, saved-model inference, and measured
 are implemented. Hybrid risk scoring now runs on banking events with persistent evidence
 and time-based decay. Automatic account blocking, session revocation, persisted alerts,
 admin recovery APIs, and an authenticated live alert stream are implemented.
-The admin dashboard UI, IP management, and broader live monitoring remain planned;
+Suspicious-IP tracking, independent IP controls, temporary restrictions, and local
+recovery are implemented. The admin dashboard UI and broader live monitoring remain planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -36,7 +37,7 @@ python -m venv .venv
 # macOS/Linux: source .venv/bin/activate
 python -m pip install -e "backend[dev]"
 cp .env.example .env
-python -m uvicorn app.main:app --reload --port 8000
+python -m app.run --reload --port 8000
 ```
 
 In two additional terminals, from the repository root:
@@ -145,3 +146,11 @@ confirmed administrator block/unblock actions, persistent settings, alert APIs, 
 `/ws/admin/events` alert stream. Unblock requires a fresh login and resets current risk by
 default while preserving historical evidence. Account blocks never block a shared IP.
 Admin controls currently use backend APIs; their dashboard UI is a later feature.
+
+## IP restrictions and local recovery
+
+[IP security documentation](docs/ip-security.md) explains source-address trust, temporary
+abuse restrictions, admin block/unblock APIs, IP alerts, and shared-address effects.
+Account and IP restrictions remain independent. The development runner ignores forwarded
+headers by default. If you restrict the shared local IP, use the documented development-only
+`python -m app.recover_ip` command against the same database; there is no admin HTTP bypass.

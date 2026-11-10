@@ -4,6 +4,7 @@ from dataclasses import asdict
 from app.fsm.engine import VERSION, step
 from app.models.entities import SecurityEvent
 from app.services.risk import assess_event
+from app.services.ips import observe_event
 
 
 def record(db, request, kind, user_id=None, session=None, outcome="success", *, banking=True):
@@ -24,4 +25,5 @@ def record(db, request, kind, user_id=None, session=None, outcome="success", *, 
     db.flush()
     if banking:
         assess_event(db, request, row, transition)
+    observe_event(db, request, row)
     return row

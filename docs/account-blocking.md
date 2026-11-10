@@ -27,7 +27,8 @@ count as fresh weighted threat assessments, avoiding recursive scoring and enfor
 
 Blocks persist across restarts. Risk decay does not unblock an account. A block targets the
 account only: other users on the same IP and administrator sessions are unaffected.
-No IP block is created by this feature.
+Account blocking does not create IP restrictions. Separate [IP controls](ip-security.md)
+now support independently reviewed restrictions.
 
 ## Administrator actions
 
@@ -94,11 +95,11 @@ are distinct fields.
 
 Banking and admin login throttles now use separate endpoint namespaces, so a banking failed-login
 burst cannot consume the admin login budget needed for account recovery. IP restriction and
-its separate development recovery mechanism remain a later feature.
+its development recovery command are now documented in [IP security](ip-security.md).
 
 ## Live alert stream
 
-`/ws/admin/events?after_id=0` requires an authenticated administrator cookie. Browser Origin
+`/ws/admin/events?after_id=0&after_ip_id=0` requires an authenticated administrator cookie. Browser Origin
 must be on the configured allowlist; ordinary banking cookies cannot authenticate this stream.
 The backend rechecks session validity/revocation on every poll and closes invalid sessions
 with code 4401. Untrusted origins receive 4403.
@@ -117,6 +118,7 @@ as `after_id` to resume without replaying earlier IDs. Sending text `ping` recei
 HTTP reads provide updated resolution state; this first stream announces new alerts, not
 arbitrary security events or later edits to existing alerts.
 
+The stream also carries IP alerts with a separate cursor; see [IP security](ip-security.md).
 The admin Vite server proxies `/ws` with WebSocket support. The later admin dashboard will
 consume this channel; its UI is still the existing foundation page.
 

@@ -111,8 +111,8 @@ create a user risk snapshot. Admin authentication events are outside the banking
 resets have explicitly marked snapshots and exclude pre-reset activity from future windows.
 
 An event's source IP remains in the security log, but it is not used to copy account risk
-onto other accounts or an IP-level score. Separate suspicious-IP scoring and enforcement
-will be implemented in their own feature.
+onto other accounts or an IP-level score. Separate [suspicious-IP scoring and enforcement](ip-security.md) are now implemented
+without inheriting user risk or changing this hybrid formula.
 
 ## Persistence and administrator APIs
 

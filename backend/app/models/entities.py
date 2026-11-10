@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import ForeignKey, String, Text, Index, text
+from sqlalchemy import ForeignKey, String, Text, Index, text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database.store import Base, now
 
@@ -120,3 +120,49 @@ class RiskReset(Base):
     event_id: Mapped[int] = mapped_column(ForeignKey("security_events.id"), unique=True)
     admin_id: Mapped[int] = mapped_column(ForeignKey("admin_users.id"))
     created_at: Mapped[datetime] = mapped_column(default=now)
+
+
+class SuspiciousIP(Base):
+    __tablename__ = "suspicious_ips"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    address: Mapped[str] = mapped_column(String(45),unique=True,index=True)
+    first_seen: Mapped[datetime] = mapped_column(default=now)
+    last_seen: Mapped[datetime] = mapped_column(default=now)
+    suspicious_count: Mapped[int] = mapped_column(default=0)
+    risk_score: Mapped[float] = mapped_column(default=0)
+    reset_event_id: Mapped[int] = mapped_column(default=0)
+
+
+class IPAccount(Base):
+    __tablename__ = "ip_accounts"
+    __table_args__ = (UniqueConstraint("ip_id","user_id"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ip_id: Mapped[int] = mapped_column(ForeignKey("suspicious_ips.id"),index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),index=True)
+    first_seen: Mapped[datetime] = mapped_column(default=now)
+    last_seen: Mapped[datetime] = mapped_column(default=now)
+
+
+class IPRestriction(Base):
+    __tablename__ = "ip_restrictions"
+    __table_args__ = (Index("uq_active_ip_restriction","ip_id",unique=True,sqlite_where=text("active = 1")),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ip_id: Mapped[int] = mapped_column(ForeignKey("suspicious_ips.id"),index=True)
+    active: Mapped[bool] = mapped_column(default=True)
+    source: Mapped[str]
+    reason: Mapped[str] = mapped_column(Text)
+    evidence: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=now)
+    expires_at: Mapped[datetime | None]
+    released_at: Mapped[datetime | None]
+
+
+class IPSecurityAlert(Base):
+    __tablename__ = "ip_security_alerts"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ip_id: Mapped[int] = mapped_column(ForeignKey("suspicious_ips.id"),index=True)
+    restriction_id: Mapped[int] = mapped_column(ForeignKey("ip_restrictions.id"),unique=True)
+    reason: Mapped[str] = mapped_column(Text)
+    evidence: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=now)
+    resolved_at: Mapped[datetime | None]

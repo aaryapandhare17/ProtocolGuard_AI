@@ -10,6 +10,8 @@ from app.services.risk import load_detector
 from app.api.blocking import router as blocking_router
 from app.websocket.routes import router as websocket_router
 from app.models.entities import SecuritySettings
+from app.api.ips import router as ip_router
+from app.security.gateway import IPGateway
 
 
 def create_app(config=None) -> FastAPI:
@@ -39,6 +41,8 @@ def create_app(config=None) -> FastAPI:
     app.include_router(risk_router)
     app.include_router(blocking_router)
     app.include_router(websocket_router)
+    app.include_router(ip_router)
+    app.add_middleware(IPGateway,factory=factory,config=config)
 
     @app.get("/api/health", tags=["health"])
     def health() -> dict[str, str]:
