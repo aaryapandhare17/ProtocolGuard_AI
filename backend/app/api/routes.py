@@ -137,3 +137,30 @@ def admin_logout(response: Response, auth=Depends(admin_identity)):
     auth[1].revoked = True
     response.delete_cookie("pg_admin")
     return {"status": "logged_out"}
+
+
+@router.get("/bank/balance")
+def balance(request: Request, auth=Depends(bank_identity), db=Depends(database)):
+    user, session = auth
+    record(db, request, "VIEW_BALANCE", user.id, session)
+    return {"balance_cents": user.balance_cents, "currency": "INR", "username": user.username}
+
+
+@router.get("/bank/history")
+def history(request: Request, auth=Depends(bank_identity), db=Depends(database)):
+    user, session = auth
+    record(db, request, "VIEW_HISTORY", user.id, session)
+    events = db.scalars(select(SecurityEvent).where(SecurityEvent.user_id == user.id).order_by(SecurityEvent.id.desc()).limit(30)).all()
+    return [{"id": e.id, "action": e.event_type, "outcome": e.outcome, "created_at": e.created_at.isoformat()+"Z"} for e in events]
+
+
+class Transfer(BaseModel):
+    amount_cents: int = Field(strict=True, gt=0, le=100000000)
+    recipient: str = Field(min_length=3, max_length=80, pattern=r"^[A-Za-z0-9 _-]+$")
+
+
+@router.post("/bank/transfer-request")
+def transfer(data: Transfer, request: Request, auth=Depends(bank_identity), db=Depends(database)):
+    user, session = auth
+    record(db, request, "TRANSFER_REQUEST", user.id, session)
+    return {"status": "simulation_only", "message": "Transfer request recorded. No money was moved.", "amount_cents": data.amount_cents}

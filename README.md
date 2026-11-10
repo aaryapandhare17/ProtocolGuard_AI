@@ -5,12 +5,14 @@ A Theory of Computation project using simulated banking data only.
 
 ## Current implementation
 
-Initial monorepo foundation: two responsive React/Vite apps, Tailwind styling,
-a FastAPI health endpoint, environment configuration, and foundation tests.
+Two React/Vite apps, Tailwind styling, FastAPI, environment configuration, and tests.
+SecureBank has a responsive login page and authenticated dashboard with real balance,
+activity history, simulated transfer requests, logout, and a restricted-access screen.
 Persistent users, separate admin authentication, expiring/revocable sessions, CSRF protection,
 login throttling, and authentication event records are implemented.
 FSM, ML, automated blocking, and live monitoring are planned;
-the initial pages deliberately show development status instead of fabricated banking data.
+the admin app currently shows development status. Banking balances are seeded dummy data;
+activity comes from persisted security events.
 
 ## Requirements
 
@@ -39,7 +41,7 @@ npm run dev:admin
 
 SecureBank: http://localhost:5173 · Admin: http://localhost:5174
 API documentation: http://localhost:8000/docs · Health: http://localhost:8000/api/health
-Both apps display the result of a real backend health request.
+The admin foundation displays a real backend health check. SecureBank calls authenticated banking APIs.
 
 ## Checks
 
@@ -74,3 +76,15 @@ Authentication uses HttpOnly, SameSite=Strict cookies and session tokens hashed 
 POST requests with a session require the login response's CSRF token in `X-CSRF-Token`.
 Sessions expire after two hours; logout revokes them. Production cookies require HTTPS.
 Client IPs come from the connection, never arbitrary forwarded headers.
+
+## Banking workflow
+
+Sign in to SecureBank with a provisioned demo account. Balance/history buttons fetch
+backend data and record security events. Transfer requests validate a dummy recipient
+and amount and persist a TRANSFER_REQUEST event without changing balances or making payments.
+Logout revokes the session. CSRF tokens are held in sessionStorage; session cookies are HttpOnly.
+Opening a session in a different browser tab may require signing in again for write actions.
+Access restrictions are checked by the backend and have a dedicated frontend page.
+
+For an alternate development backend, set `API_PROXY_TARGET` before starting SecureBank.
+The default is http://127.0.0.1:8000. Include the actual frontend origin in CORS_ORIGINS.
