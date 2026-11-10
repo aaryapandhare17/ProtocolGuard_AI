@@ -3,7 +3,10 @@
 SecureBank (port 5173) and ProtocolGuard Admin (port 5174) are separate React apps.
 Both send /api requests through their Vite development proxy to FastAPI (8000).
 SQLite will persist users, sessions, events, detection evidence, blocks, and audit logs.
-The current foundation exposes only a health endpoint; no auth or detection is implemented yet.
+The backend implements persistent demo accounts, separate administrator authentication,
+HttpOnly sessions, CSRF validation, session expiration/revocation, login throttling,
+and authentication security events. Detection is the next stage.
+SQLite write transactions are serialized with BEGIN IMMEDIATE to avoid lost updates.
 
 Planned event path: verified session → banking action → persisted security event →
 analytical DFA and ML inference → hybrid risk evidence → backend block policy → admin WebSocket update.
