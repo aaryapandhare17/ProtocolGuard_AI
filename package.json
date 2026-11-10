@@ -1,0 +1,14 @@
+{
+  "name": "protocolguard-ai",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:bank": "npm run dev --workspace @protocolguard/securebank",
+    "dev:admin": "npm run dev --workspace @protocolguard/admin",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces"
+  }
+}
