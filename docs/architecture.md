@@ -42,3 +42,7 @@ The administrator frontend now consumes these real read APIs and authenticated s
 See the [dashboard guide](admin-dashboard.md) and [API projection reference](admin-api.md).
 It keeps separate page components, request/resource/live hooks, shared UI primitives and
 confirmed mutations; chart-heavy pages are loaded lazily.
+
+The lazily loaded FSM page uses React Flow for the backend-defined graph and advances
+through persisted transition snapshots without issuing banking actions. See the
+[visualizer guide](fsm-visualizer.md) for partial-history and acceptance semantics.

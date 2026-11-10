@@ -79,6 +79,7 @@ def test_persisted_workflow_and_admin_replay(app):
     with admin_client(app) as admin:
         sessions = admin.get('/api/admin/fsm/sessions').json()
         assert len(sessions) == 1
+        assert sessions[0]['username'] == 'demo01'
         report = admin.get('/api/admin/fsm/sessions/'+sessions[0]['session_id']).json()
         assert report['accepted'] and report['complete_trace']
         assert report['events'] == ['LOGIN_ATTEMPT', 'LOGIN_SUCCESS', 'VIEW_BALANCE', 'VIEW_HISTORY',

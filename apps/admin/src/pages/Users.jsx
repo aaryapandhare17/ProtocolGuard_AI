@@ -270,7 +270,16 @@ export function UserDetail({ live, onAction }) {
               </ResourceState>
             </section>
             <section className="panel">
-              <SectionHeader title="Session transitions" />
+              <SectionHeader title="Session transitions">
+                {data.events.find((event) => event.session_id && event.fsm) && (
+                  <Link
+                    className="text-link"
+                    to={`/fsm?session=${encodeURIComponent(data.events.find((event) => event.session_id && event.fsm).session_id)}`}
+                  >
+                    Replay latest session
+                  </Link>
+                )}
+              </SectionHeader>
               {data.events
                 .filter((event) => event.fsm)
                 .slice(0, 8)

@@ -115,7 +115,8 @@ Session identifiers in the API are stored one-way token digests, never raw cooki
 Bank users and unauthenticated callers cannot access these APIs. Use the existing
 `POST /api/admin/auth/login` in `/docs` with the provisioned admin credentials first;
 Swagger's browser receives the session cookie. Then call the read-only routes above.
-The React Flow admin visualizer will be implemented in its later planned feature.
+The [React Flow administrator visualizer](fsm-visualizer.md) now renders this definition
+and supports read-only recorded-session replay.
 
 No schema change or database reset is needed. Previous records without versioned FSM
 evidence are preserved and excluded from replay. A trace with a missing historical prefix

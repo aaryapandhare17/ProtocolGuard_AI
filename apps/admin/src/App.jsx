@@ -29,6 +29,7 @@ import { useLive } from "./hooks/useLive";
 import { Brand } from "./components/UI";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Login from "./pages/Login";
+const FSM = lazy(() => import("./pages/FSM"));
 const Overview = lazy(() => import("./pages/Overview"));
 import Monitoring from "./pages/Monitoring";
 const Users = lazy(() =>
@@ -49,7 +50,6 @@ const navigation = [
   ["Security alerts", "/alerts", Bell],
 ];
 const planned = [
-  ["FSM visualizer", GitBranch],
   ["ML analytics", ChartNoAxesCombined],
   ["Detector comparison", SlidersHorizontal],
   ["Simulation lab", TestTube2],
@@ -130,9 +130,11 @@ function Dashboard({ identity, onLogout }) {
         ? location.pathname === "/"
         : location.pathname.startsWith(path),
     )?.[0] ||
-    (location.pathname.startsWith("/settings")
-      ? "Settings"
-      : "Security operations");
+    (location.pathname.startsWith("/fsm")
+      ? "FSM visualizer"
+      : location.pathname.startsWith("/settings")
+        ? "Settings"
+        : "Security operations");
   return (
     <div className="admin-shell">
       <aside className={`sidebar ${mobile ? "open" : ""}`}>
@@ -153,6 +155,10 @@ function Dashboard({ identity, onLogout }) {
             </NavLink>
           ))}
           <span className="nav-label analysis-label">ANALYSIS</span>
+          <NavLink to="/fsm">
+            <GitBranch size={17} />
+            FSM visualizer
+          </NavLink>
           {planned.map(([label, Icon]) => (
             <button key={label} disabled title="Planned in an upcoming feature">
               <Icon size={17} />
@@ -254,6 +260,7 @@ function Dashboard({ identity, onLogout }) {
           >
             <Routes>
               <Route path="/" element={<Overview live={live} />} />
+              <Route path="/fsm" element={<FSM live={live} />} />
               <Route path="/monitoring" element={<Monitoring live={live} />} />
               <Route
                 path="/users"

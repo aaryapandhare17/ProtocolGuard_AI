@@ -20,7 +20,8 @@ admin recovery APIs, and an authenticated live alert stream are implemented.
 Suspicious-IP tracking, independent IP controls, temporary restrictions, and local
 recovery are implemented. The dark admin dashboard now provides verified login, overview charts, live monitoring,
 account/IP management, alerts, risk histories, security settings, and audit logs.
-FSM visualization, ML analytics/comparison pages, and the simulation lab remain planned;
+Interactive FSM visualization and read-only recorded-session replay are implemented.
+ML analytics/comparison pages and the simulation lab remain planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -165,3 +166,9 @@ See the [dashboard guide](docs/admin-dashboard.md) and [monitoring API reference
 for pages, security controls, live connection behavior, development proxies, and screenshot steps.
 All metrics and charts come from persisted backend data. Upcoming analysis/simulation pages
 are explicitly disabled until their separate features are implemented.
+
+## FSM visualizer
+
+The admin sidebar now opens an interactive eight-state graph and recorded-session replay.
+See [the visualizer guide](docs/fsm-visualizer.md) for playback, seeking, rejection highlighting,
+partial-history behavior, user-detail links, and read-only guarantees.
