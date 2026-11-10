@@ -7,6 +7,7 @@ from sqlalchemy import select, func
 from app.database.store import now
 from app.models.entities import Admin, User, Session, SecurityEvent
 from app.security.credentials import digest, verify_password, hash_password
+from app.services.events import record
 
 router = APIRouter(prefix="/api")
 DUMMY_HASH = hash_password(secrets.token_urlsafe(32))
@@ -28,21 +29,13 @@ def database(request: Request):
             raise
 
 
-def record(db, request, kind, user_id=None, session=None, outcome="success"):
-    db.add(SecurityEvent(user_id=user_id, session_id=session.id if session else None,
-        ip=request.client.host if request.client else "unknown", event_type=kind,
-        endpoint=request.url.path, outcome=outcome,
-        state_before=session.state if session else "LOGGED_OUT",
-        state_after=session.state if session else "LOGGED_OUT"))
-    db.flush()
-
-
 def identity(request: Request, db=Depends(database), admin=False):
     cookie = "pg_admin" if admin else "pg_bank"
     raw = request.cookies.get(cookie, "")
     session = db.get(Session, digest(raw)) if raw else None
     if not session or session.revoked or session.expires_at <= now():
-        record(db, request, "UNAUTHORIZED_REQUEST", outcome="denied")
+        record(db, request, "UNAUTHORIZED_REQUEST",
+            session.user_id if session and not admin else None, session, "denied", banking=not admin)
         raise HTTPException(401, "Authentication required")
     person = db.get(Admin if admin else User, session.admin_id if admin else session.user_id) if (session.admin_id if admin else session.user_id) else None
     if not person:
@@ -79,24 +72,27 @@ def login(data, request, response, db, admin):
         SecurityEvent.ip == ip, SecurityEvent.event_type == "LOGIN_ATTEMPT",
         SecurityEvent.created_at > now() - timedelta(minutes=1)))
     if recent >= 20:
-        record(db, request, "RATE_LIMIT_TRIGGERED", outcome="denied")
+        record(db, request, "RATE_LIMIT_TRIGGERED", outcome="denied", banking=not admin)
         raise HTTPException(429, "Too many login attempts. Try again later.")
     table = Admin if admin else User
     person = db.scalar(select(table).where(table.username == data.username))
     uid = person.id if person and not admin else None
-    record(db, request, "LOGIN_ATTEMPT", uid)
-    if not verify_password(data.password, person.password_hash if person else DUMMY_HASH):
-        record(db, request, "LOGIN_FAILED", uid, outcome="denied")
-        raise HTTPException(401, "Invalid username or password")
-    if not admin and person.blocked:
-        record(db, request, "ACCESS_BLOCKED", uid, outcome="denied")
-        raise HTTPException(403, "Account access restricted")
     token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
-    session = Session(id=digest(token), csrf_hash=digest(csrf), user_id=None if admin else person.id,
-        admin_id=person.id if admin else None, expires_at=now()+timedelta(hours=2))
+    session = Session(id=digest(token), csrf_hash=digest(csrf), user_id=uid,
+        admin_id=person.id if person and admin else None,
+        expires_at=now()+timedelta(hours=2), state="LOGGED_OUT")
     db.add(session)
     db.flush()
-    record(db, request, "LOGIN_SUCCESS", uid, session)
+    record(db, request, "LOGIN_ATTEMPT", uid, session, banking=not admin)
+    if not verify_password(data.password, person.password_hash if person else DUMMY_HASH):
+        record(db, request, "LOGIN_FAILED", uid, session, "denied", banking=not admin)
+        session.revoked = True
+        raise HTTPException(401, "Invalid username or password")
+    if not admin and person.blocked:
+        record(db, request, "ACCESS_BLOCKED", uid, session, "denied")
+        session.revoked = True
+        raise HTTPException(403, "Account access restricted")
+    record(db, request, "LOGIN_SUCCESS", uid, session, banking=not admin)
     response.set_cookie("pg_admin" if admin else "pg_bank", token, httponly=True,
         secure=request.app.state.settings.protocolguard_env != "development", samesite="strict", max_age=7200)
     return {"username": person.username, "csrf_token": csrf, "role": "admin" if admin else "user"}
@@ -127,7 +123,6 @@ def logout(request: Request, response: Response, auth=Depends(bank_identity), db
     person, session = auth
     record(db, request, "LOGOUT", person.id, session)
     session.revoked = True
-    session.state = "LOGGED_OUT"
     response.delete_cookie("pg_bank")
     return {"status": "logged_out"}
 
@@ -163,4 +158,5 @@ class Transfer(BaseModel):
 def transfer(data: Transfer, request: Request, auth=Depends(bank_identity), db=Depends(database)):
     user, session = auth
     record(db, request, "TRANSFER_REQUEST", user.id, session)
+    record(db, request, "TRANSFER_RECORDED", user.id, session)
     return {"status": "simulation_only", "message": "Transfer request recorded. No money was moved.", "amount_cents": data.amount_cents}

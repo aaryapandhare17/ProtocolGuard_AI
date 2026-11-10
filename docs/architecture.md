@@ -5,7 +5,10 @@ Both send /api requests through their Vite development proxy to FastAPI (8000).
 SQLite will persist users, sessions, events, detection evidence, blocks, and audit logs.
 The backend implements persistent demo accounts, separate administrator authentication,
 HttpOnly sessions, CSRF validation, session expiration/revocation, login throttling,
-and authentication security events. Detection is the next stage.
+and banking security events. A pure DFA now processes banking events in the same
+transaction, preserving before/after states and versioned violation evidence.
+Admin-only APIs expose the definition and persisted session replay; see [FSM documentation](fsm.md).
+ML and hybrid scoring are the next stages.
 SQLite write transactions are serialized with BEGIN IMMEDIATE to avoid lost updates.
 
 Planned event path: verified session → banking action → persisted security event →

@@ -10,7 +10,8 @@ SecureBank has a responsive login page and authenticated dashboard with real bal
 activity history, simulated transfer requests, logout, and a restricted-access screen.
 Persistent users, separate admin authentication, expiring/revocable sessions, CSRF protection,
 login throttling, and authentication event records are implemented.
-FSM, ML, automated blocking, and live monitoring are planned;
+A deterministic banking-session FSM records versioned transitions and violations, with
+admin-only definition and replay APIs. ML, automated blocking, and live monitoring are planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -54,7 +55,7 @@ npm run build
 ## Environment variables
 
 See `.env.example`: `PROTOCOLGUARD_ENV` identifies the environment;
-`DATABASE_URL` reserves the planned persistence URL; `CORS_ORIGINS` is a comma-separated
+`DATABASE_URL` selects the persistent database; `CORS_ORIGINS` is a comma-separated
 allowlist. Run the backend from the repository root to load `.env` consistently.
 Never commit `.env`, credentials, local databases, or generated model artifacts.
 
@@ -88,3 +89,9 @@ Access restrictions are checked by the backend and have a dedicated frontend pag
 
 For an alternate development backend, set `API_PROXY_TARGET` before starting SecureBank.
 The default is http://127.0.0.1:8000. Include the actual frontend origin in CORS_ORIGINS.
+
+## Finite-state analysis
+
+See [the DFA definition, transition table, examples, and replay API](docs/fsm.md).
+Banking events update independent session states and preserve violation evidence.
+The FSM analyzes protocol order; verified sessions and backend authorization still control access.

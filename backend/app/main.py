@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.database.store import Base, configure
 from app.api.routes import router
+from app.api.fsm import router as fsm_router
 
 
 def create_app(config=None) -> FastAPI:
@@ -23,6 +24,7 @@ def create_app(config=None) -> FastAPI:
         allow_credentials=True, allow_methods=["GET", "POST"],
         allow_headers=["Content-Type", "Authorization", "X-CSRF-Token"])
     app.include_router(router)
+    app.include_router(fsm_router)
 
     @app.get("/api/health", tags=["health"])
     def health() -> dict[str, str]:
