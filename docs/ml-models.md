@@ -136,3 +136,7 @@ The inference service now contributes to [hybrid scoring](hybrid-risk.md) throug
 banking event pipeline. [Account enforcement](account-blocking.md) now acts on the combined
 risk score; a model prediction alone is not a block decision. There is no
 prediction upload endpoint; artifacts are generated and loaded from trusted local storage.
+
+Measured models and operational prediction history are now visible in the admin dashboard.
+The [four-detector comparison](ml-analytics.md) adds FSM-only and frozen hybrid policy
+evaluation on the same observations without retraining or retuning.

@@ -12,6 +12,7 @@ from app.websocket.routes import router as websocket_router
 from app.models.entities import SecuritySettings
 from app.api.ips import router as ip_router
 from app.api.dashboard import router as dashboard_router
+from app.api.analytics import router as analytics_router
 from app.security.gateway import IPGateway
 
 
@@ -44,6 +45,7 @@ def create_app(config=None) -> FastAPI:
     app.include_router(websocket_router)
     app.include_router(ip_router)
     app.include_router(dashboard_router)
+    app.include_router(analytics_router)
     app.add_middleware(IPGateway,factory=factory,config=config)
 
     @app.get("/api/health", tags=["health"])

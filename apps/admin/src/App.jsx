@@ -29,6 +29,8 @@ import { useLive } from "./hooks/useLive";
 import { Brand } from "./components/UI";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Login from "./pages/Login";
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Comparison = lazy(() => import("./pages/Comparison"));
 const FSM = lazy(() => import("./pages/FSM"));
 const Overview = lazy(() => import("./pages/Overview"));
 import Monitoring from "./pages/Monitoring";
@@ -49,11 +51,7 @@ const navigation = [
   ["Suspicious IPs", "/ips", Globe],
   ["Security alerts", "/alerts", Bell],
 ];
-const planned = [
-  ["ML analytics", ChartNoAxesCombined],
-  ["Detector comparison", SlidersHorizontal],
-  ["Simulation lab", TestTube2],
-];
+const planned = [["Simulation lab", TestTube2]];
 function describe(action) {
   if (action.kind === "account_block")
     return {
@@ -130,11 +128,15 @@ function Dashboard({ identity, onLogout }) {
         ? location.pathname === "/"
         : location.pathname.startsWith(path),
     )?.[0] ||
-    (location.pathname.startsWith("/fsm")
-      ? "FSM visualizer"
-      : location.pathname.startsWith("/settings")
-        ? "Settings"
-        : "Security operations");
+    (location.pathname.startsWith("/analytics")
+      ? "ML analytics"
+      : location.pathname.startsWith("/comparison")
+        ? "Detector comparison"
+        : location.pathname.startsWith("/fsm")
+          ? "FSM visualizer"
+          : location.pathname.startsWith("/settings")
+            ? "Settings"
+            : "Security operations");
   return (
     <div className="admin-shell">
       <aside className={`sidebar ${mobile ? "open" : ""}`}>
@@ -158,6 +160,14 @@ function Dashboard({ identity, onLogout }) {
           <NavLink to="/fsm">
             <GitBranch size={17} />
             FSM visualizer
+          </NavLink>
+          <NavLink to="/analytics">
+            <ChartNoAxesCombined size={17} />
+            ML analytics
+          </NavLink>
+          <NavLink to="/comparison">
+            <SlidersHorizontal size={17} />
+            Detector comparison
           </NavLink>
           {planned.map(([label, Icon]) => (
             <button key={label} disabled title="Planned in an upcoming feature">
@@ -260,6 +270,8 @@ function Dashboard({ identity, onLogout }) {
           >
             <Routes>
               <Route path="/" element={<Overview live={live} />} />
+              <Route path="/analytics" element={<Analytics live={live} />} />
+              <Route path="/comparison" element={<Comparison live={live} />} />
               <Route path="/fsm" element={<FSM live={live} />} />
               <Route path="/monitoring" element={<Monitoring live={live} />} />
               <Route

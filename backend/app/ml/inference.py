@@ -35,7 +35,9 @@ class DetectorBundle:
         if manifest.get("artifact_version") != ARTIFACT_VERSION or sha256(directory/"detectors.joblib") != manifest.get("sha256"):
             raise ValueError("Model artifact checksum or version mismatch")
         # joblib can execute code: only load artifacts trained in a trusted local workspace.
-        return cls(joblib.load(directory/"detectors.joblib"))
+        instance=cls(joblib.load(directory/"detectors.joblib"))
+        instance.artifact_sha256=manifest["sha256"]
+        return instance
 
     def predict(self, events, initial_state="LOGGED_OUT", *, complete=False):
         events = tuple(events)

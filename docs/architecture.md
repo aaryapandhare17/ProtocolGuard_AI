@@ -46,3 +46,7 @@ confirmed mutations; chart-heavy pages are loaded lazily.
 The lazily loaded FSM page uses React Flow for the backend-defined graph and advances
 through persisted transition snapshots without issuing banking actions. See the
 [visualizer guide](fsm-visualizer.md) for partial-history and acceptance semantics.
+
+The ML analytics/comparison pages read verified saved reports and bounded persisted model
+predictions. A separate CLI compares frozen detectors on identical observations without
+fitting; synthetic evaluation stays separate from operational history. See [analytics](ml-analytics.md).

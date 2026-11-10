@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ip_restriction_seconds: int = Field(default=120,ge=5,le=86400)
     auto_block_enabled: bool = True
     block_threshold: float = Field(default=60, ge=0, le=100, allow_inf_nan=False)
+    ml_comparison_report: str = "ml/evaluation/comparison-v1.json"
     ml_enabled: bool = True
     ml_model_directory: str = "ml/artifacts/bank-v1"
     risk_fsm_weight: float = Field(default=0.30, ge=0, le=1, allow_inf_nan=False)

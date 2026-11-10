@@ -25,11 +25,13 @@ in again. Logout revokes the admin session and unmounts the monitoring connectio
 | IP detail | Current restriction, expiry, evidence, restriction history and network event history |
 | FSM visualizer | Eight-state React Flow graph, persisted transition replay, invalid-edge highlighting, seek/play/pause controls and formal transition reference |
 | Security alerts | Account and IP incidents, unresolved/history views, evidence inspection, account-alert resolution and IP release |
+| ML analytics | Saved RF/IF metrics, confusion matrices, feature importances, and separate recent live prediction history |
+| Detector comparison | Verified same-cohort FSM/RF/IF/hybrid results, timing, frozen policy and provenance |
 | Settings | Confirmed persistent threshold/enablement changes, model availability, risk weights and administrator/system audit records |
 
-The ML analytics, detector comparison, and simulation lab are explicitly
+The simulation lab is explicitly
 marked as upcoming and disabled. There are no invented metrics or substitute charts for
-those features. Model training statistics are not mixed into the live overview.
+that feature. Model training statistics are not mixed into the live overview.
 
 ## Security actions
 
@@ -98,3 +100,5 @@ For project screenshots, seed accounts and run a normal SecureBank session first
 Use only dummy accounts and never capture an entered password or CSRF/session token.
 
 See the [FSM visualizer guide](fsm-visualizer.md) for recorded-session snapshots and replay controls.
+
+See [ML analytics and comparison](ml-analytics.md) for saved report setup and interpretation.

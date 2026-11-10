@@ -1866,3 +1866,228 @@ th {
 .detail-stats .panel > strong.fsm-classification {
   font-size: 22px;
 }
+.evaluation-body {
+  padding: 0 23px 24px;
+}
+.evaluation-provenance {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  font-size: 10px;
+}
+.evaluation-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 22px 0;
+}
+.evaluation-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 10px;
+  color: #9696a7;
+  min-width: 0;
+}
+.evaluation-controls select {
+  background: #0e0e13;
+  color: #d4d4e1;
+  border: 1px solid #353543;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 11px;
+  min-width: 0;
+  max-width: 100%;
+}
+.model-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.model-card {
+  border: 1px solid #30303b;
+  border-radius: 7px;
+  min-width: 0;
+  overflow: hidden;
+}
+.model-metrics {
+  display: flex;
+  flex-direction: column;
+  padding: 0 22px;
+}
+.model-metrics > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #292932;
+  font-size: 11px;
+  color: #9898a9;
+}
+.model-metrics strong {
+  font-weight: 550;
+  color: #e2e2ed;
+  font-variant-numeric: tabular-nums;
+}
+.metric-note {
+  color: #838394;
+  font-size: 10px;
+  line-height: 1.8;
+  padding: 17px 22px;
+}
+.evaluation-body > .metric-note {
+  padding: 0;
+  margin: 18px 0;
+}
+.evaluation-note {
+  font-size: 10px;
+  color: #9292a3;
+  line-height: 1.9;
+  margin: 20px 0;
+}
+.confusion {
+  padding: 20px 22px;
+  min-width: 0;
+}
+.confusion h3 {
+  margin-bottom: 9px;
+}
+.confusion > .muted {
+  font-size: 9px;
+  margin-bottom: 16px;
+}
+.confusion table {
+  font-size: 12px;
+  table-layout: fixed;
+  text-align: center;
+}
+.confusion th {
+  font-size: 8px;
+  padding: 10px 6px;
+  border: 1px solid #30303b;
+  white-space: normal;
+}
+.confusion td {
+  padding: 17px 8px;
+  border: 1px solid #30303b;
+  font-variant-numeric: tabular-nums;
+}
+.confusion td.correct {
+  background: #1e332b44;
+  color: #a7c5b5;
+}
+.confusion td.mistake {
+  background: #3c222944;
+  color: #d79ca9;
+}
+.importance-section {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid #2b2b35;
+}
+.importance-section > .muted {
+  font-size: 10px;
+  margin-top: 9px;
+}
+.importance-chart {
+  height: 350px;
+  margin-top: 20px;
+}
+.operational-chart {
+  padding: 10px 22px 24px;
+}
+.operational-chart > p {
+  font-size: 10px;
+}
+.anomaly-chart {
+  height: 240px;
+  margin-top: 20px;
+}
+.prediction-context {
+  display: block;
+  font-size: 9px;
+  color: #818193;
+  margin-top: 7px;
+  white-space: nowrap;
+}
+.comparison-chart {
+  height: 300px;
+  margin-top: 30px;
+}
+.comparison-matrices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.comparison-matrices .confusion {
+  border: 1px solid #30303c;
+  border-radius: 7px;
+}
+.policy-heading {
+  margin: 25px 0 15px;
+}
+.policy-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.evaluation-empty strong {
+  display: block;
+  font-size: 15px;
+  color: #b0b0bf;
+  margin-bottom: 12px;
+}
+.evaluation-empty p {
+  margin-top: 8px;
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 1000px) {
+  .model-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .evaluation-body {
+    padding: 0 17px 20px;
+  }
+  .evaluation-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  .evaluation-controls label {
+    width: 100%;
+  }
+  .evaluation-controls select {
+    width: 100%;
+    font-size: 10px;
+  }
+  .comparison-matrices {
+    grid-template-columns: 1fr;
+  }
+  .confusion {
+    padding: 18px 15px;
+  }
+  .importance-chart {
+    height: 350px;
+  }
+  .comparison-chart {
+    height: 280px;
+  }
+  .operational-chart {
+    padding: 10px 15px 20px;
+  }
+  .metric-note {
+    padding: 15px;
+  }
+  .model-card .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .comparison-chart .recharts-cartesian-axis-tick {
+    font-size: 8px;
+  }
+}

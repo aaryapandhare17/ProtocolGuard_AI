@@ -1,0 +1,899 @@
+{
+  "dataset": {
+    "files": {
+      "features.csv": {
+        "bytes": 6171360,
+        "sha256": "a7b2451f1a8250b79bdbe79fc7eb028770b5766e9ae31fffd740ee3b6cbec44b"
+      },
+      "sessions.jsonl": {
+        "bytes": 23592410,
+        "sha256": "4769a1f0c21df1bf644b16cea0550a9259e0ac1e3cb116124930fc9ff44d0522"
+      }
+    },
+    "seed": 42,
+    "sessions": 10000,
+    "split_sessions": {
+      "held_out": 776,
+      "test": 1346,
+      "train": 6498,
+      "validation": 1380
+    }
+  },
+  "feature_schema": {
+    "feature_names": [
+      "event_count",
+      "login_failure_count",
+      "transfer_attempt_count",
+      "invalid_transition_count",
+      "invalid_transition_rate",
+      "session_duration_seconds",
+      "request_frequency",
+      "average_inter_event_seconds",
+      "minimum_inter_event_seconds",
+      "short_interval_ratio",
+      "distinct_endpoint_count",
+      "unknown_event_count",
+      "event_fraction:LOGIN_ATTEMPT",
+      "event_fraction:LOGIN_SUCCESS",
+      "event_fraction:LOGIN_FAILED",
+      "event_fraction:VIEW_BALANCE",
+      "event_fraction:VIEW_HISTORY",
+      "event_fraction:TRANSFER_REQUEST",
+      "event_fraction:TRANSFER_RECORDED",
+      "event_fraction:RETURN",
+      "event_fraction:CANCEL_TRANSFER",
+      "event_fraction:LOGOUT",
+      "event_fraction:UNAUTHORIZED_REQUEST",
+      "event_fraction:RATE_LIMIT_TRIGGERED",
+      "event_fraction:ACCESS_BLOCKED",
+      "event_fraction:BLOCK_ACCOUNT",
+      "transition_fraction:LOGGED_OUT:LOGGED_OUT",
+      "transition_fraction:LOGGED_OUT:AUTHENTICATING",
+      "transition_fraction:LOGGED_OUT:AUTHENTICATED",
+      "transition_fraction:LOGGED_OUT:VIEWING_ACCOUNT",
+      "transition_fraction:LOGGED_OUT:TRANSFER_PENDING",
+      "transition_fraction:LOGGED_OUT:CLOSED",
+      "transition_fraction:LOGGED_OUT:BLOCKED",
+      "transition_fraction:LOGGED_OUT:REJECTED",
+      "transition_fraction:AUTHENTICATING:LOGGED_OUT",
+      "transition_fraction:AUTHENTICATING:AUTHENTICATING",
+      "transition_fraction:AUTHENTICATING:AUTHENTICATED",
+      "transition_fraction:AUTHENTICATING:VIEWING_ACCOUNT",
+      "transition_fraction:AUTHENTICATING:TRANSFER_PENDING",
+      "transition_fraction:AUTHENTICATING:CLOSED",
+      "transition_fraction:AUTHENTICATING:BLOCKED",
+      "transition_fraction:AUTHENTICATING:REJECTED",
+      "transition_fraction:AUTHENTICATED:LOGGED_OUT",
+      "transition_fraction:AUTHENTICATED:AUTHENTICATING",
+      "transition_fraction:AUTHENTICATED:AUTHENTICATED",
+      "transition_fraction:AUTHENTICATED:VIEWING_ACCOUNT",
+      "transition_fraction:AUTHENTICATED:TRANSFER_PENDING",
+      "transition_fraction:AUTHENTICATED:CLOSED",
+      "transition_fraction:AUTHENTICATED:BLOCKED",
+      "transition_fraction:AUTHENTICATED:REJECTED",
+      "transition_fraction:VIEWING_ACCOUNT:LOGGED_OUT",
+      "transition_fraction:VIEWING_ACCOUNT:AUTHENTICATING",
+      "transition_fraction:VIEWING_ACCOUNT:AUTHENTICATED",
+      "transition_fraction:VIEWING_ACCOUNT:VIEWING_ACCOUNT",
+      "transition_fraction:VIEWING_ACCOUNT:TRANSFER_PENDING",
+      "transition_fraction:VIEWING_ACCOUNT:CLOSED",
+      "transition_fraction:VIEWING_ACCOUNT:BLOCKED",
+      "transition_fraction:VIEWING_ACCOUNT:REJECTED",
+      "transition_fraction:TRANSFER_PENDING:LOGGED_OUT",
+      "transition_fraction:TRANSFER_PENDING:AUTHENTICATING",
+      "transition_fraction:TRANSFER_PENDING:AUTHENTICATED",
+      "transition_fraction:TRANSFER_PENDING:VIEWING_ACCOUNT",
+      "transition_fraction:TRANSFER_PENDING:TRANSFER_PENDING",
+      "transition_fraction:TRANSFER_PENDING:CLOSED",
+      "transition_fraction:TRANSFER_PENDING:BLOCKED",
+      "transition_fraction:TRANSFER_PENDING:REJECTED",
+      "transition_fraction:CLOSED:LOGGED_OUT",
+      "transition_fraction:CLOSED:AUTHENTICATING",
+      "transition_fraction:CLOSED:AUTHENTICATED",
+      "transition_fraction:CLOSED:VIEWING_ACCOUNT",
+      "transition_fraction:CLOSED:TRANSFER_PENDING",
+      "transition_fraction:CLOSED:CLOSED",
+      "transition_fraction:CLOSED:BLOCKED",
+      "transition_fraction:CLOSED:REJECTED",
+      "transition_fraction:BLOCKED:LOGGED_OUT",
+      "transition_fraction:BLOCKED:AUTHENTICATING",
+      "transition_fraction:BLOCKED:AUTHENTICATED",
+      "transition_fraction:BLOCKED:VIEWING_ACCOUNT",
+      "transition_fraction:BLOCKED:TRANSFER_PENDING",
+      "transition_fraction:BLOCKED:CLOSED",
+      "transition_fraction:BLOCKED:BLOCKED",
+      "transition_fraction:BLOCKED:REJECTED",
+      "transition_fraction:REJECTED:LOGGED_OUT",
+      "transition_fraction:REJECTED:AUTHENTICATING",
+      "transition_fraction:REJECTED:AUTHENTICATED",
+      "transition_fraction:REJECTED:VIEWING_ACCOUNT",
+      "transition_fraction:REJECTED:TRANSFER_PENDING",
+      "transition_fraction:REJECTED:CLOSED",
+      "transition_fraction:REJECTED:BLOCKED",
+      "transition_fraction:REJECTED:REJECTED"
+    ],
+    "fsm_version": "bank-session-v1",
+    "version": "bank-features-v1"
+  },
+  "hybrid_scope": "Single-session instantaneous assessment; rolling in-session behavior only; no prior-score retention, cross-session login window, account/IP enforcement, or admin resets.",
+  "hybrid_threshold": 60,
+  "limitations": [
+    "Synthetic evaluation does not establish real-world accuracy.",
+    "Prefix observations from the same session are correlated; complete-session counts are reported separately.",
+    "The live account pipeline includes cross-session evidence and decay; this controlled detector comparison measures single-session snapshots.",
+    "Timing uses the same first 40 complete test sessions for all detectors and varies with hardware."
+  ],
+  "model_sha256": "a9f75b5e364702014ed00c0e64df427d300d212b8bb5d2e84aff2a55f03cbdd3",
+  "models": {
+    "fsm_only": {
+      "latency": {
+        "median_ms": 0.008949,
+        "p95_ms": 0.06188739999999998,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.6926546391752577,
+            "confusion_matrix": [
+              [
+                2150,
+                0
+              ],
+              [
+                954,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 3104
+          },
+          "complete": {
+            "accuracy": 0.5025773195876289,
+            "confusion_matrix": [
+              [
+                390,
+                0
+              ],
+              [
+                386,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 776
+          },
+          "prefix": {
+            "accuracy": 0.7560137457044673,
+            "confusion_matrix": [
+              [
+                1760,
+                0
+              ],
+              [
+                568,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 2328
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.7399103139013453,
+            "confusion_matrix": [
+              [
+                3303,
+                0
+              ],
+              [
+                1392,
+                657
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.48558758314855877,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.3206442166910688,
+            "samples": 5352
+          },
+          "complete": {
+            "accuracy": 0.7176820208023774,
+            "confusion_matrix": [
+              [
+                773,
+                0
+              ],
+              [
+                380,
+                193
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.5039164490861618,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.3368237347294939,
+            "samples": 1346
+          },
+          "prefix": {
+            "accuracy": 0.747378931602596,
+            "confusion_matrix": [
+              [
+                2530,
+                0
+              ],
+              [
+                1012,
+                464
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.47835051546391755,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.3143631436314363,
+            "samples": 4006
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.7085839256424276,
+            "confusion_matrix": [
+              [
+                3207,
+                0
+              ],
+              [
+                1599,
+                681
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.45997973657548125,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.2986842105263158,
+            "samples": 5487
+          },
+          "complete": {
+            "accuracy": 0.7007246376811594,
+            "confusion_matrix": [
+              [
+                766,
+                0
+              ],
+              [
+                413,
+                201
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.49325153374233127,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.3273615635179153,
+            "samples": 1380
+          },
+          "prefix": {
+            "accuracy": 0.7112247382517652,
+            "confusion_matrix": [
+              [
+                2441,
+                0
+              ],
+              [
+                1186,
+                480
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.4473438956197577,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.28811524609843936,
+            "samples": 4107
+          }
+        }
+      }
+    },
+    "hybrid": {
+      "latency": {
+        "median_ms": 12.060564,
+        "p95_ms": 13.855825349999998,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.6926546391752577,
+            "confusion_matrix": [
+              [
+                2150,
+                0
+              ],
+              [
+                954,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 3104
+          },
+          "complete": {
+            "accuracy": 0.5025773195876289,
+            "confusion_matrix": [
+              [
+                390,
+                0
+              ],
+              [
+                386,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 776
+          },
+          "prefix": {
+            "accuracy": 0.7560137457044673,
+            "confusion_matrix": [
+              [
+                1760,
+                0
+              ],
+              [
+                568,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 2328
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.8643497757847534,
+            "confusion_matrix": [
+              [
+                3303,
+                0
+              ],
+              [
+                726,
+                1323
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7846975088967971,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.6456808199121523,
+            "samples": 5352
+          },
+          "complete": {
+            "accuracy": 0.9546805349182764,
+            "confusion_matrix": [
+              [
+                773,
+                0
+              ],
+              [
+                61,
+                512
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.943778801843318,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.893542757417103,
+            "samples": 1346
+          },
+          "prefix": {
+            "accuracy": 0.8339990014977534,
+            "confusion_matrix": [
+              [
+                2530,
+                0
+              ],
+              [
+                665,
+                811
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7092260603410582,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.5494579945799458,
+            "samples": 4006
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.8430836522689995,
+            "confusion_matrix": [
+              [
+                3207,
+                0
+              ],
+              [
+                861,
+                1419
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7672343876723439,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.6223684210526316,
+            "samples": 5487
+          },
+          "complete": {
+            "accuracy": 0.936231884057971,
+            "confusion_matrix": [
+              [
+                766,
+                0
+              ],
+              [
+                88,
+                526
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9228070175438596,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.8566775244299675,
+            "samples": 1380
+          },
+          "prefix": {
+            "accuracy": 0.8117847577307037,
+            "confusion_matrix": [
+              [
+                2441,
+                0
+              ],
+              [
+                773,
+                893
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.6979288784681517,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.536014405762305,
+            "samples": 4107
+          }
+        }
+      }
+    },
+    "isolation_forest": {
+      "latency": {
+        "median_ms": 5.8076015,
+        "p95_ms": 6.7072971,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.9693943298969072,
+            "confusion_matrix": [
+              [
+                2055,
+                95
+              ],
+              [
+                0,
+                954
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9525711432850724,
+            "false_positive_rate": 0.044186046511627906,
+            "precision": 0.909437559580553,
+            "recall": 1.0,
+            "samples": 3104
+          },
+          "complete": {
+            "accuracy": 0.9974226804123711,
+            "confusion_matrix": [
+              [
+                388,
+                2
+              ],
+              [
+                0,
+                386
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9974160206718347,
+            "false_positive_rate": 0.005128205128205128,
+            "precision": 0.9948453608247423,
+            "recall": 1.0,
+            "samples": 776
+          },
+          "prefix": {
+            "accuracy": 0.9600515463917526,
+            "confusion_matrix": [
+              [
+                1667,
+                93
+              ],
+              [
+                0,
+                568
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9243287225386493,
+            "false_positive_rate": 0.05284090909090909,
+            "precision": 0.859304084720121,
+            "recall": 1.0,
+            "samples": 2328
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.7778400597907325,
+            "confusion_matrix": [
+              [
+                3121,
+                182
+              ],
+              [
+                1007,
+                1042
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.6367247173846624,
+            "false_positive_rate": 0.05510142294883439,
+            "precision": 0.8513071895424836,
+            "recall": 0.5085407515861395,
+            "samples": 5352
+          },
+          "complete": {
+            "accuracy": 0.7786032689450223,
+            "confusion_matrix": [
+              [
+                668,
+                105
+              ],
+              [
+                193,
+                380
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.718336483931947,
+            "false_positive_rate": 0.13583441138421734,
+            "precision": 0.7835051546391752,
+            "recall": 0.6631762652705061,
+            "samples": 1346
+          },
+          "prefix": {
+            "accuracy": 0.7775836245631552,
+            "confusion_matrix": [
+              [
+                2453,
+                77
+              ],
+              [
+                814,
+                662
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.5977426636568849,
+            "false_positive_rate": 0.030434782608695653,
+            "precision": 0.8958051420838972,
+            "recall": 0.44850948509485095,
+            "samples": 4006
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.7805722617094951,
+            "confusion_matrix": [
+              [
+                3059,
+                148
+              ],
+              [
+                1056,
+                1224
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.6703176341730559,
+            "false_positive_rate": 0.04614904895541004,
+            "precision": 0.892128279883382,
+            "recall": 0.5368421052631579,
+            "samples": 5487
+          },
+          "complete": {
+            "accuracy": 0.7855072463768116,
+            "confusion_matrix": [
+              [
+                671,
+                95
+              ],
+              [
+                201,
+                413
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7361853832442068,
+            "false_positive_rate": 0.12402088772845953,
+            "precision": 0.812992125984252,
+            "recall": 0.6726384364820847,
+            "samples": 1380
+          },
+          "prefix": {
+            "accuracy": 0.7789140491843195,
+            "confusion_matrix": [
+              [
+                2388,
+                53
+              ],
+              [
+                855,
+                811
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.6411067193675889,
+            "false_positive_rate": 0.021712412945514133,
+            "precision": 0.9386574074074074,
+            "recall": 0.48679471788715484,
+            "samples": 4107
+          }
+        }
+      }
+    },
+    "random_forest": {
+      "latency": {
+        "median_ms": 5.774512,
+        "p95_ms": 7.90358465,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.939110824742268,
+            "confusion_matrix": [
+              [
+                1961,
+                189
+              ],
+              [
+                0,
+                954
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9098712446351931,
+            "false_positive_rate": 0.08790697674418604,
+            "precision": 0.8346456692913385,
+            "recall": 1.0,
+            "samples": 3104
+          },
+          "complete": {
+            "accuracy": 1.0,
+            "confusion_matrix": [
+              [
+                390,
+                0
+              ],
+              [
+                0,
+                386
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "samples": 776
+          },
+          "prefix": {
+            "accuracy": 0.9188144329896907,
+            "confusion_matrix": [
+              [
+                1571,
+                189
+              ],
+              [
+                0,
+                568
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.8573584905660377,
+            "false_positive_rate": 0.10738636363636364,
+            "precision": 0.750330250990753,
+            "recall": 1.0,
+            "samples": 2328
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.9820627802690582,
+            "confusion_matrix": [
+              [
+                3207,
+                96
+              ],
+              [
+                0,
+                2049
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.977110157367668,
+            "false_positive_rate": 0.029064486830154404,
+            "precision": 0.9552447552447553,
+            "recall": 1.0,
+            "samples": 5352
+          },
+          "complete": {
+            "accuracy": 0.9992570579494799,
+            "confusion_matrix": [
+              [
+                772,
+                1
+              ],
+              [
+                0,
+                573
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.999128160418483,
+            "false_positive_rate": 0.00129366106080207,
+            "precision": 0.9982578397212544,
+            "recall": 1.0,
+            "samples": 1346
+          },
+          "prefix": {
+            "accuracy": 0.9762855716425362,
+            "confusion_matrix": [
+              [
+                2435,
+                95
+              ],
+              [
+                0,
+                1476
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9688217919264851,
+            "false_positive_rate": 0.037549407114624504,
+            "precision": 0.939528962444303,
+            "recall": 1.0,
+            "samples": 4006
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.9983597594313832,
+            "confusion_matrix": [
+              [
+                3198,
+                9
+              ],
+              [
+                0,
+                2280
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9980302035456337,
+            "false_positive_rate": 0.002806361085126286,
+            "precision": 0.9960681520314548,
+            "recall": 1.0,
+            "samples": 5487
+          },
+          "complete": {
+            "accuracy": 1.0,
+            "confusion_matrix": [
+              [
+                766,
+                0
+              ],
+              [
+                0,
+                614
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "samples": 1380
+          },
+          "prefix": {
+            "accuracy": 0.997808619430241,
+            "confusion_matrix": [
+              [
+                2432,
+                9
+              ],
+              [
+                0,
+                1666
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9973061957497755,
+            "false_positive_rate": 0.0036870135190495697,
+            "precision": 0.9946268656716418,
+            "recall": 1.0,
+            "samples": 4107
+          }
+        }
+      }
+    }
+  },
+  "observation_counts": {
+    "held_out": 3104,
+    "test": 5352,
+    "train": 25835,
+    "validation": 5487
+  },
+  "policy": {
+    "behavior_weight": 0.25,
+    "fsm_weight": 0.3,
+    "half_life_seconds": 600,
+    "if_weight": 0.1,
+    "max_events": 200,
+    "rf_weight": 0.35,
+    "version": "hybrid-risk-v1",
+    "window_seconds": 60
+  },
+  "thresholds": {
+    "isolation_forest": 0.5838056624059736,
+    "random_forest": 0.0125
+  },
+  "tuning": "No fitting or threshold selection. Frozen model thresholds and declared hybrid policy.",
+  "version": "bank-comparison-v1"
+}

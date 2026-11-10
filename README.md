@@ -21,7 +21,8 @@ Suspicious-IP tracking, independent IP controls, temporary restrictions, and loc
 recovery are implemented. The dark admin dashboard now provides verified login, overview charts, live monitoring,
 account/IP management, alerts, risk histories, security settings, and audit logs.
 Interactive FSM visualization and read-only recorded-session replay are implemented.
-ML analytics/comparison pages and the simulation lab remain planned;
+ML analytics and four-detector comparison now show measured synthetic evaluation and
+separate live prediction history. The controlled simulation lab remains planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -164,11 +165,22 @@ headers by default. If you restrict the shared local IP, use the documented deve
 Open http://localhost:5174 and sign in with the provisioned administrator credentials.
 See the [dashboard guide](docs/admin-dashboard.md) and [monitoring API reference](docs/admin-api.md)
 for pages, security controls, live connection behavior, development proxies, and screenshot steps.
-All metrics and charts come from persisted backend data. Upcoming analysis/simulation pages
-are explicitly disabled until their separate features are implemented.
+All metrics and charts come from persisted backend data. The upcoming simulation lab is explicitly disabled until its separate feature is implemented.
 
 ## FSM visualizer
 
 The admin sidebar now opens an interactive eight-state graph and recorded-session replay.
 See [the visualizer guide](docs/fsm-visualizer.md) for playback, seeking, rejection highlighting,
 partial-history behavior, user-detail links, and read-only guarantees.
+
+## ML analytics and detector comparison
+
+```sh
+python -m app.ml.compare --dataset ml/datasets/bank-v1 --artifacts ml/artifacts/bank-v1 --output ml/evaluation/comparison-v1.json
+```
+
+The admin sidebar now opens measured model metrics, confusion matrices, feature importance,
+recent operational predictions, and a same-cohort comparison of FSM/RF/IF/hybrid detectors.
+See [analytics setup and interpretation](docs/ml-analytics.md) and the
+[executed comparison report](docs/detector-comparison.json). Missing reports show an explicit
+unavailable state. Evaluation commands do not retrain models or modify banking records.
