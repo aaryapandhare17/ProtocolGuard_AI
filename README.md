@@ -18,7 +18,9 @@ are implemented. Hybrid risk scoring now runs on banking events with persistent 
 and time-based decay. Automatic account blocking, session revocation, persisted alerts,
 admin recovery APIs, and an authenticated live alert stream are implemented.
 Suspicious-IP tracking, independent IP controls, temporary restrictions, and local
-recovery are implemented. The admin dashboard UI and broader live monitoring remain planned;
+recovery are implemented. The dark admin dashboard now provides verified login, overview charts, live monitoring,
+account/IP management, alerts, risk histories, security settings, and audit logs.
+FSM visualization, ML analytics/comparison pages, and the simulation lab remain planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -49,7 +51,8 @@ npm run dev:admin
 
 SecureBank: http://localhost:5173 · Admin: http://localhost:5174
 API documentation: http://localhost:8000/docs · Health: http://localhost:8000/api/health
-The admin foundation displays a real backend health check. SecureBank calls authenticated banking APIs.
+The admin dashboard reads authenticated monitoring APIs and a live event/alert stream.
+SecureBank calls authenticated banking APIs.
 
 ## Checks
 
@@ -145,7 +148,7 @@ See [account blocking and recovery](docs/account-blocking.md) for automatic enfo
 confirmed administrator block/unblock actions, persistent settings, alert APIs, and the
 `/ws/admin/events` alert stream. Unblock requires a fresh login and resets current risk by
 default while preserving historical evidence. Account blocks never block a shared IP.
-Admin controls currently use backend APIs; their dashboard UI is a later feature.
+Admin controls are available in the dashboard with confirmation dialogs and review notes.
 
 ## IP restrictions and local recovery
 
@@ -154,3 +157,11 @@ abuse restrictions, admin block/unblock APIs, IP alerts, and shared-address effe
 Account and IP restrictions remain independent. The development runner ignores forwarded
 headers by default. If you restrict the shared local IP, use the documented development-only
 `python -m app.recover_ip` command against the same database; there is no admin HTTP bypass.
+
+## Admin dashboard
+
+Open http://localhost:5174 and sign in with the provisioned administrator credentials.
+See the [dashboard guide](docs/admin-dashboard.md) and [monitoring API reference](docs/admin-api.md)
+for pages, security controls, live connection behavior, development proxies, and screenshot steps.
+All metrics and charts come from persisted backend data. Upcoming analysis/simulation pages
+are explicitly disabled until their separate features are implemented.

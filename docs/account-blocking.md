@@ -34,7 +34,7 @@ now support independently reviewed restrictions.
 
 All routes require an administrator cookie. Mutation routes also require the login response's
 CSRF token in `X-CSRF-Token`, `confirmed: true`, and a nonblank note of 3–500 characters.
-The API confirmation is ready for the later admin UI's confirmation dialogs.
+The admin dashboard now supplies confirmation dialogs, review notes and visible action results.
 
 | Route | Behavior |
 | --- | --- |
@@ -119,8 +119,7 @@ HTTP reads provide updated resolution state; this first stream announces new ale
 arbitrary security events or later edits to existing alerts.
 
 The stream also carries IP alerts with a separate cursor; see [IP security](ip-security.md).
-The admin Vite server proxies `/ws` with WebSocket support. The later admin dashboard will
-consume this channel; its UI is still the existing foundation page.
+The admin Vite server proxies `/ws` with WebSocket support. The admin dashboard now consumes this channel for live alerts and monitoring.
 
 ## Checks
 

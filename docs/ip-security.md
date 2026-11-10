@@ -122,8 +122,8 @@ Example block body:
 ```
 
 Omit `duration_seconds` for a persistent manual block. Unblock accepts the same fields except
-duration. The block response indicates `affects_current_connection` so a future admin UI can
-explain self-lockout. Repeated block/unblock operations are audited no-ops rather than new
+duration. The block response indicates `affects_current_connection`; dashboard dialogs explain
+shared-IP effects and self-lockout before confirmation. Repeated block/unblock operations are audited no-ops rather than new
 restrictions or new alerts. Independent account blocks and account risk are preserved.
 
 ## Safe local recovery
@@ -150,8 +150,7 @@ The authenticated `/ws/admin/events` stream now adds `ip_security_alerts` messag
 account alerts. IP alerts have a separate `ip_cursor`; reconnect using both `after_id` and
 `after_ip_id`. The connected/pong messages include both cursors. Each IP alert contains its
 address, restriction ID, reason, evidence, timestamps and resolution state. Alerts are read
-only after database commit. The admin dashboard UI that consumes these APIs remains a later
-feature; HTTP reads supply updated resolution state.
+only after database commit. The admin dashboard now consumes these APIs; HTTP reads supply updated resolution state.
 
 ## Validation
 

@@ -137,7 +137,7 @@ Read-only administrator endpoints require a verified admin session:
 
 System BLOCK_ACCOUNT control markers link enforcement evidence without adding new threat
 assessments. No unauthenticated or ordinary banking caller can read these endpoints. Use administrator
-login in `/docs` for now; admin dashboard visualization is a later feature.
+login in `/docs` or the [admin dashboard](admin-dashboard.md).
 
 ## Configuration and checks
 
