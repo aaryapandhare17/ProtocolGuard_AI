@@ -8,7 +8,9 @@ HttpOnly sessions, CSRF validation, session expiration/revocation, login throttl
 and banking security events. A pure DFA now processes banking events in the same
 transaction, preserving before/after states and versioned violation evidence.
 Admin-only APIs expose the definition and persisted session replay; see [FSM documentation](fsm.md).
-ML and hybrid scoring are the next stages.
+The ML package generates reproducible synthetic sessions and exports shared numeric features,
+with grouped train/validation/test partitions and unseen held-out scenario families.
+See [dataset documentation](ml-dataset.md). Model training and hybrid scoring are next.
 SQLite write transactions are serialized with BEGIN IMMEDIATE to avoid lost updates.
 
 Planned event path: verified session → banking action → persisted security event →

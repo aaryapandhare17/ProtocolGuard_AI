@@ -11,7 +11,9 @@ activity history, simulated transfer requests, logout, and a restricted-access s
 Persistent users, separate admin authentication, expiring/revocable sessions, CSRF protection,
 login throttling, and authentication event records are implemented.
 A deterministic banking-session FSM records versioned transitions and violations, with
-admin-only definition and replay APIs. ML, automated blocking, and live monitoring are planned;
+admin-only definition and replay APIs. Reproducible synthetic session generation and a shared
+90-feature ML extractor are implemented.
+Model training, automated blocking, and live monitoring are planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -95,3 +97,16 @@ The default is http://127.0.0.1:8000. Include the actual frontend origin in CORS
 See [the DFA definition, transition table, examples, and replay API](docs/fsm.md).
 Banking events update independent session states and preserve violation evidence.
 The FSM analyzes protocol order; verified sessions and backend authorization still control access.
+
+## Generate the ML dataset
+
+With the backend environment activated, from the repository root:
+
+```sh
+python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v1
+```
+
+This creates ignored JSONL sessions, feature CSV, and a versioned manifest. Existing
+outputs are never overwritten. See [dataset design and feature definitions](docs/ml-dataset.md)
+for scenario labels, grouped partitions, held-out cases, reproducibility, and limitations.
+Model training and accuracy evaluation are the next feature.
