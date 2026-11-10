@@ -10,7 +10,10 @@ transaction, preserving before/after states and versioned violation evidence.
 Admin-only APIs expose the definition and persisted session replay; see [FSM documentation](fsm.md).
 The ML package generates reproducible synthetic sessions and exports shared numeric features,
 with grouped train/validation/test partitions and unseen held-out scenario families.
-See [dataset documentation](ml-dataset.md). Model training and hybrid scoring are next.
+See [dataset documentation](ml-dataset.md). Random Forest and normal-only Isolation Forest
+now train with partition-preserving prefixes; validated artifacts share the runtime feature
+contract. Frozen thresholds support saved-model inference and independent reevaluation.
+See [model documentation and measurements](ml-models.md). Hybrid scoring is next.
 SQLite write transactions are serialized with BEGIN IMMEDIATE to avoid lost updates.
 
 Planned event path: verified session → banking action → persisted security event →

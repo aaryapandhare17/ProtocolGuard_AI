@@ -13,7 +13,8 @@ login throttling, and authentication event records are implemented.
 A deterministic banking-session FSM records versioned transitions and violations, with
 admin-only definition and replay APIs. Reproducible synthetic session generation and a shared
 90-feature ML extractor are implemented.
-Model training, automated blocking, and live monitoring are planned;
+Random Forest and Isolation Forest training, saved-model inference, and measured evaluation
+are implemented. Hybrid risk scoring, automated blocking, and live monitoring are planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -109,4 +110,18 @@ python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v1
 This creates ignored JSONL sessions, feature CSV, and a versioned manifest. Existing
 outputs are never overwritten. See [dataset design and feature definitions](docs/ml-dataset.md)
 for scenario labels, grouped partitions, held-out cases, reproducibility, and limitations.
-Model training and accuracy evaluation are the next feature.
+See the model training commands below for actual evaluation.
+
+## Train and evaluate the detectors
+
+```sh
+python -m pip install -e "backend[dev,ml]"
+python -m app.ml.train --dataset ml/datasets/bank-v1 --output ml/artifacts/bank-v1
+python -m app.ml.evaluate --dataset ml/datasets/bank-v1 --artifacts ml/artifacts/bank-v1 --output ml/evaluation/bank-v1.json
+```
+
+Use new output paths when repeating runs. [Model documentation](docs/ml-models.md)
+explains prefix observations, threshold selection, inference, and measured limitations.
+The [recorded evaluation](docs/ml-evaluation.json) includes test and held-out results;
+these are synthetic-data measurements, not production accuracy claims.
+ML-specific tests require the `ml` extra; without it those tests are skipped.

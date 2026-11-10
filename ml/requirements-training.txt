@@ -1,0 +1,12 @@
+# Exact ML dependencies used for the recorded run on Python 3.12.14.
+scikit-learn==1.9.1
+numpy==2.5.4
+pandas==2.3.3
+joblib==1.6.0
+scipy==1.18.1
+threadpoolctl==3.8.0
+narwhals==2.28.0
+cloudpickle==3.1.2
+python-dateutil==4.0.0
+pytz==2026.6
+tzdata==2026.6

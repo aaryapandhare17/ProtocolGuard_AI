@@ -3,7 +3,7 @@
 ## Scope
 
 This feature generates labeled activity, assigns partitions, and extracts features.
-It does not train models or report model accuracy. The generator makes no HTTP requests
+Model training is a separate module; see [model documentation](ml-models.md). The generator makes no HTTP requests
 and uses no real accounts, IP addresses, payments, or customer data.
 
 Run from the repository root with the backend environment activated:
@@ -119,5 +119,6 @@ so the training feature must add/evaluate prefix observations without crossing g
 Synthetic scenarios are simplified and intentionally separable in places; even excellent metrics
 on them would not establish production readiness or a probability of malicious behavior.
 
-Next: train and persist Random Forest and Isolation Forest artifacts, with actual measured
-validation/test/held-out metrics and consistent preprocessing.
+The training feature adds partition-preserving prefix observations, persists Random Forest
+and Isolation Forest artifacts, and reports actual validation/test/held-out measurements.
+See [model documentation](ml-models.md).

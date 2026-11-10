@@ -13,3 +13,5 @@ ml/artifacts/*
 !ml/artifacts/.gitkeep
 ml/datasets/*
 !ml/datasets/.gitkeep
+ml/evaluation/*
+!ml/evaluation/.gitkeep
