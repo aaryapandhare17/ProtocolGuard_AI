@@ -15,7 +15,9 @@ admin-only definition and replay APIs. Reproducible synthetic session generation
 90-feature ML extractor are implemented.
 Random Forest and Isolation Forest training, saved-model inference, and measured evaluation
 are implemented. Hybrid risk scoring now runs on banking events with persistent evidence
-and time-based decay. Automatic blocking and live monitoring are planned;
+and time-based decay. Automatic account blocking, session revocation, persisted alerts,
+admin recovery APIs, and an authenticated live alert stream are implemented.
+The admin dashboard UI, IP management, and broader live monitoring remain planned;
 the admin app currently shows development status. Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
@@ -133,4 +135,13 @@ Banking events now persist FSM, ML, and behavioral evidence with per-user score 
 See [the scoring formula, configuration, and admin APIs](docs/hybrid-risk.md).
 Models load from `ML_MODEL_DIRECTORY` at startup; train them first for full ML coverage.
 If models are unavailable, assessments explicitly show degraded coverage. Scores decay
-while inactive and do not repeatedly add the same evidence. Account blocking is the next feature.
+while inactive and do not repeatedly add the same evidence. Enabled account enforcement
+blocks scores above the persistent threshold (60 by default).
+
+## Account enforcement and alerts
+
+See [account blocking and recovery](docs/account-blocking.md) for automatic enforcement,
+confirmed administrator block/unblock actions, persistent settings, alert APIs, and the
+`/ws/admin/events` alert stream. Unblock requires a fresh login and resets current risk by
+default while preserving historical evidence. Account blocks never block a shared IP.
+Admin controls currently use backend APIs; their dashboard UI is a later feature.

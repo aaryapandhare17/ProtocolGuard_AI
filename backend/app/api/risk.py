@@ -5,14 +5,15 @@ from app.api.routes import admin_identity, database
 from app.models.entities import DetectionResult, RiskScore, User
 from app.security.risk import RiskPolicy
 from app.services.risk import current_risk
+from app.services.blocking import settings
 
 router = APIRouter(prefix="/api/admin", dependencies=[Depends(admin_identity)])
 
 
 @router.get("/risk/policy")
-def policy(request: Request):
+def policy(request: Request,db=Depends(database)):
     return {**RiskPolicy.from_settings(request.app.state.settings).describe(),
-        "ml_status": request.app.state.ml_status, "automatic_blocking": False,
+        "ml_status": request.app.state.ml_status, **settings(db,request.app.state.settings),
         "ip_risk_included": False, "score_note": "Risk index, not a probability"}
 
 

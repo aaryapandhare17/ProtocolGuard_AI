@@ -44,7 +44,8 @@ Each slash-separated alternative represents its own explicit transition.
 transaction occurred. It follows TRANSFER_REQUEST in the same database transaction.
 This lets another legitimate transfer request start afterward. RETURN and CANCEL_TRANSFER
 are supported by the engine for later simulation/replay, but have no public banking endpoint.
-BLOCK_ACCOUNT is reserved for the later blocking feature; no automatic blocking is added here.
+BLOCK_ACCOUNT is now emitted by account enforcement to mark session revocation; its control
+markers link the block evidence without recursively adding fresh risk.
 Events outside Σ are reported as invalid input and rejected by the pure analysis engine as well.
 
 ## Prefixes, accepted sessions, and suspicious traces
@@ -97,7 +98,8 @@ requests still commit their security evidence through the existing database depe
 Authentication continues to verify the session, expiry, revocation, role, account status,
 and CSRF token independently. A DFA state can neither grant access nor replace these
 checks. A detected protocol violation records evidence and contributes to the
-[hybrid risk score](hybrid-risk.md). Automatic blocking will be added later.
+[hybrid risk score](hybrid-risk.md). [Account enforcement](account-blocking.md) now blocks
+accounts above their configured threshold, independently of DFA analysis.
 
 ## Administrator API
 

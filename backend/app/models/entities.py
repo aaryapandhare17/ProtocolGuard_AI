@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import ForeignKey, String, Text, Index, text
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database.store import Base, now
 
@@ -67,3 +67,56 @@ class RiskScore(Base):
     previous_score: Mapped[float]
     score: Mapped[float]
     created_at: Mapped[datetime] = mapped_column(default=now, index=True)
+
+
+class SecuritySettings(Base):
+    __tablename__ = "security_settings"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    block_threshold: Mapped[float] = mapped_column(default=60)
+    auto_block_enabled: Mapped[bool] = mapped_column(default=True)
+
+
+class BlockedEntity(Base):
+    __tablename__ = "blocked_entities"
+    __table_args__ = (Index("uq_active_account_block", "user_id", unique=True, sqlite_where=text("active = 1")),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    entity_type: Mapped[str] = mapped_column(default="account")
+    active: Mapped[bool] = mapped_column(default=True, index=True)
+    source: Mapped[str]
+    reason: Mapped[str] = mapped_column(Text)
+    evidence: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=now)
+    released_at: Mapped[datetime | None]
+
+
+class SecurityAlert(Base):
+    __tablename__ = "security_alerts"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    block_id: Mapped[int] = mapped_column(ForeignKey("blocked_entities.id"), unique=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    severity: Mapped[str] = mapped_column(default="high")
+    reason: Mapped[str] = mapped_column(Text)
+    evidence: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=now, index=True)
+    resolved_at: Mapped[datetime | None]
+    resolved_by: Mapped[int | None] = mapped_column(ForeignKey("admin_users.id"))
+
+
+class AdminAuditLog(Base):
+    __tablename__ = "admin_audit_logs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    admin_id: Mapped[int | None] = mapped_column(ForeignKey("admin_users.id"))
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), index=True)
+    action: Mapped[str]
+    evidence: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=now)
+
+
+class RiskReset(Base):
+    __tablename__ = "risk_resets"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    event_id: Mapped[int] = mapped_column(ForeignKey("security_events.id"), unique=True)
+    admin_id: Mapped[int] = mapped_column(ForeignKey("admin_users.id"))
+    created_at: Mapped[datetime] = mapped_column(default=now)

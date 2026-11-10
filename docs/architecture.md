@@ -3,7 +3,8 @@
 SecureBank (port 5173) and ProtocolGuard Admin (port 5174) are separate React apps.
 Both send /api requests through their Vite development proxy to FastAPI (8000).
 SQLite persists users, sessions, security events, detection evidence, and risk histories.
-Block records, alerts, and audit logs are planned in the enforcement features.
+Account blocks, security alerts, administrator audit logs, and risk-reset baselines are
+also persisted. IP management is a separate upcoming feature.
 The backend implements persistent demo accounts, separate administrator authentication,
 HttpOnly sessions, CSRF validation, session expiration/revocation, login throttling,
 and banking security events. A pure DFA now processes banking events in the same
@@ -16,7 +17,9 @@ now train with partition-preserving prefixes; validated artifacts share the runt
 contract. Frozen thresholds support saved-model inference and independent reevaluation.
 See [model documentation and measurements](ml-models.md). The event pipeline now computes
 hybrid scores in the same transaction, retaining component evidence and decaying history.
-See [hybrid risk documentation](hybrid-risk.md). Account blocking and alerts are next.
+See [hybrid risk documentation](hybrid-risk.md). Assessments above the persistent threshold
+now block accounts and revoke sessions transactionally. Admin recovery APIs and committed
+alert WebSocket delivery are implemented; see [account enforcement](account-blocking.md).
 SQLite write transactions are serialized with BEGIN IMMEDIATE to avoid lost updates.
 
 Planned event path: verified session → banking action → persisted security event →

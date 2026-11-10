@@ -33,16 +33,17 @@ def identity(request: Request, db=Depends(database), admin=False):
     cookie = "pg_admin" if admin else "pg_bank"
     raw = request.cookies.get(cookie, "")
     session = db.get(Session, digest(raw)) if raw else None
+    person = db.get(Admin if admin else User, session.admin_id if admin else session.user_id) if session and (session.admin_id if admin else session.user_id) else None
+    # Known blocked accounts return 403 even after their sessions were revoked.
+    if not admin and person and person.blocked:
+        record(db, request, "ACCESS_BLOCKED", person.id, session, "denied")
+        raise HTTPException(403, "Account access restricted")
     if not session or session.revoked or session.expires_at <= now():
         record(db, request, "UNAUTHORIZED_REQUEST",
             session.user_id if session and not admin else None, session, "denied", banking=not admin)
         raise HTTPException(401, "Authentication required")
-    person = db.get(Admin if admin else User, session.admin_id if admin else session.user_id) if (session.admin_id if admin else session.user_id) else None
     if not person:
         raise HTTPException(403, "Role not permitted")
-    if not admin and person.blocked:
-        record(db, request, "ACCESS_BLOCKED", person.id, session, "denied")
-        raise HTTPException(403, "Account access restricted")
     if request.method not in {"GET", "HEAD", "OPTIONS"}:
         csrf = request.headers.get("X-CSRF-Token", "")
         if not csrf or not hmac.compare_digest(digest(csrf), session.csrf_hash):
@@ -70,6 +71,7 @@ def login(data, request, response, db, admin):
     ip = request.client.host if request.client else "unknown"
     recent = db.scalar(select(func.count()).select_from(SecurityEvent).where(
         SecurityEvent.ip == ip, SecurityEvent.event_type == "LOGIN_ATTEMPT",
+        SecurityEvent.endpoint == request.url.path,
         SecurityEvent.created_at > now() - timedelta(minutes=1)))
     if recent >= 20:
         record(db, request, "RATE_LIMIT_TRIGGERED", outcome="denied", banking=not admin)
@@ -93,6 +95,8 @@ def login(data, request, response, db, admin):
         session.revoked = True
         raise HTTPException(403, "Account access restricted")
     record(db, request, "LOGIN_SUCCESS", uid, session, banking=not admin)
+    if not admin and person.blocked:
+        raise HTTPException(403, "Account access restricted")
     response.set_cookie("pg_admin" if admin else "pg_bank", token, httponly=True,
         secure=request.app.state.settings.protocolguard_env != "development", samesite="strict", max_age=7200)
     return {"username": person.username, "csrf_token": csrf, "role": "admin" if admin else "user"}
@@ -138,6 +142,8 @@ def admin_logout(response: Response, auth=Depends(admin_identity)):
 def balance(request: Request, auth=Depends(bank_identity), db=Depends(database)):
     user, session = auth
     record(db, request, "VIEW_BALANCE", user.id, session)
+    if user.blocked:
+        raise HTTPException(403, "Account access restricted")
     return {"balance_cents": user.balance_cents, "currency": "INR", "username": user.username}
 
 
@@ -145,6 +151,8 @@ def balance(request: Request, auth=Depends(bank_identity), db=Depends(database))
 def history(request: Request, auth=Depends(bank_identity), db=Depends(database)):
     user, session = auth
     record(db, request, "VIEW_HISTORY", user.id, session)
+    if user.blocked:
+        raise HTTPException(403, "Account access restricted")
     events = db.scalars(select(SecurityEvent).where(SecurityEvent.user_id == user.id).order_by(SecurityEvent.id.desc()).limit(30)).all()
     return [{"id": e.id, "action": e.event_type, "outcome": e.outcome, "created_at": e.created_at.isoformat()+"Z"} for e in events]
 
@@ -158,5 +166,9 @@ class Transfer(BaseModel):
 def transfer(data: Transfer, request: Request, auth=Depends(bank_identity), db=Depends(database)):
     user, session = auth
     record(db, request, "TRANSFER_REQUEST", user.id, session)
+    if user.blocked:
+        raise HTTPException(403, "Account access restricted")
     record(db, request, "TRANSFER_RECORDED", user.id, session)
+    if user.blocked:
+        raise HTTPException(403, "Account access restricted")
     return {"status": "simulation_only", "message": "Transfer request recorded. No money was moved.", "amount_cents": data.amount_cents}

@@ -7,8 +7,8 @@ to a known account also produce append-only risk snapshots and update `users.ris
 The event, analytical FSM transition, assessment, and user snapshot share the same SQLite
 transaction. Failed API requests still retain their security evidence.
 
-This feature calculates scores; it does not automatically block accounts or create alerts.
-Those enforcement steps are the next feature. A risk score is an index, not a percentage
+The score now feeds [account enforcement](account-blocking.md), which creates persistent
+blocks and alerts above the configured threshold. A risk score is an index, not a percentage
 probability that an account owner is malicious.
 
 ## Formula
@@ -32,8 +32,8 @@ current effective score even while the account is inactive; `stored_score` remai
 last assessment snapshot, and `effective_score` includes decay since that assessment.
 New activity persists the newly calculated score. There is no automatic unblock implied by decay.
 
-Levels are low below 30, monitoring from 30 through 60, and high above 60. These levels do
-not enforce access in this feature.
+Levels are low below 30, monitoring from 30 through 60, and high above 60. The independent persistent block threshold now controls enforcement; changing it does
+not change these display bands.
 
 For example, FSM=1, RF=0.8, IF evidence=0.6, and behavior=0.4 contribute 30+28+6+10=74 points.
 Repeating those components keeps the assessment at 74 instead of accumulating to 148.
@@ -107,7 +107,8 @@ Known-user scores are keyed by user ID, never by IP. Concurrent users sharing a 
 address keep independent windows and histories. Failed-login attempts can be attributed to
 an existing username without claiming the caller authenticated as that account owner.
 Requests with no identified account receive an `unattributed_event` assessment, but do not
-create a user risk snapshot. Admin authentication events are outside the banking risk pipeline.
+create a user risk snapshot. Admin authentication events are outside the banking risk pipeline. Administrative risk
+resets have explicitly marked snapshots and exclude pre-reset activity from future windows.
 
 An event's source IP remains in the security log, but it is not used to copy account risk
 onto other accounts or an IP-level score. Separate suspicious-IP scoring and enforcement
@@ -130,11 +131,12 @@ rescored on startup, and an unchanged historical snapshot keeps its original pol
 Read-only administrator endpoints require a verified admin session:
 
 - `GET /api/admin/risk/policy`: current weights and limits, startup model status, and explicit
-  `automatic_blocking: false` and `ip_risk_included: false` flags.
+  current `automatic_blocking` enablement, the stored threshold, and `ip_risk_included: false`.
 - `GET /api/admin/users/{id}/risk?limit=50`: effective/stored scores, assessment timestamp,
   and the latest snapshot evidence. History limit is bounded to 1–200.
 
-No unauthenticated or ordinary banking caller can read these endpoints. Use administrator
+System BLOCK_ACCOUNT control markers link enforcement evidence without adding new threat
+assessments. No unauthenticated or ordinary banking caller can read these endpoints. Use administrator
 login in `/docs` for now; admin dashboard visualization is a later feature.
 
 ## Configuration and checks

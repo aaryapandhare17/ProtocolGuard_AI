@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./protocolguard.db"
     cors_origins: str = "http://localhost:5173,http://localhost:5174"
 
+    auto_block_enabled: bool = True
+    block_threshold: float = Field(default=60, ge=0, le=100, allow_inf_nan=False)
     ml_enabled: bool = True
     ml_model_directory: str = "ml/artifacts/bank-v1"
     risk_fsm_weight: float = Field(default=0.30, ge=0, le=1, allow_inf_nan=False)

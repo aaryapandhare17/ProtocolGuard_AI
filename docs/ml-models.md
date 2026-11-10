@@ -133,5 +133,6 @@ Isolation output also includes its empirical percentile relative to normal **val
 into a bounded evidence value. It does not turn an anomaly score into a probability of attack.
 
 The inference service now contributes to [hybrid scoring](hybrid-risk.md) through the
-banking event pipeline. Automatic account blocking is the next feature. There is no
+banking event pipeline. [Account enforcement](account-blocking.md) now acts on the combined
+risk score; a model prediction alone is not a block decision. There is no
 prediction upload endpoint; artifacts are generated and loaded from trusted local storage.

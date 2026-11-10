@@ -89,7 +89,7 @@ def test_pipeline_persists_user_isolation_and_admin_history(app):
         assert response['history'][0]['score'] == pytest.approx(34)
         assert first.get('/api/admin/users/999/risk').status_code == 404
         assert first.get('/api/admin/users/1/risk?limit=201').status_code == 422
-        assert first.get('/api/admin/risk/policy').json()['automatic_blocking'] is False
+        assert first.get('/api/admin/risk/policy').json()['automatic_blocking'] is True
 
 
 def test_failed_login_window_spans_attempt_sessions(app):

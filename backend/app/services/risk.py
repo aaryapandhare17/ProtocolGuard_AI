@@ -7,7 +7,7 @@ from pathlib import Path
 from sqlalchemy import select
 from app.database.store import now
 from app.ml.features import from_security_events
-from app.models.entities import DetectionResult, RiskScore, SecurityEvent, User
+from app.models.entities import DetectionResult, RiskScore, RiskReset, SecurityEvent, Session, User
 from app.security.risk import RiskPolicy, behavioral_evidence, combine, decay
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,10 @@ def model_evidence(db, app, row, recent, policy):
     if row.session_id:
         rows = list(reversed(db.scalars(select(SecurityEvent).where(
             SecurityEvent.session_id == row.session_id).order_by(SecurityEvent.id.desc()).limit(policy.max_events+1)).all()))
-        if len(rows) > policy.max_events:
+        session = db.get(Session, row.session_id)
+        if session and session.revoked:
+            skipped.append("session_revoked")
+        elif len(rows) > policy.max_events:
             skipped.append("session_event_limit")
         elif len(rows) < 4:
             skipped.append("session_too_short")
@@ -74,8 +77,10 @@ def assess_event(db, request, row, fsm_transition):
     policy = RiskPolicy.from_settings(request.app.state.settings)
     user = db.get(User, row.user_id) if row.user_id else None
     cutoff = row.created_at-timedelta(seconds=policy.window_seconds)
+    reset = db.scalar(select(RiskReset).where(RiskReset.user_id == user.id).order_by(RiskReset.id.desc()).limit(1)) if user else None
     recent = list(reversed(db.scalars(select(SecurityEvent).where(
-        SecurityEvent.user_id == user.id, SecurityEvent.created_at >= cutoff)
+        SecurityEvent.user_id == user.id, SecurityEvent.created_at >= cutoff,
+        SecurityEvent.id > (reset.event_id if reset else 0), SecurityEvent.event_type != "BLOCK_ACCOUNT")
         .order_by(SecurityEvent.id.desc()).limit(policy.max_events+1)).all())) if user else [row]
     truncated = len(recent) > policy.max_events
     recent = recent[-policy.max_events:]
@@ -109,6 +114,8 @@ def assess_event(db, request, row, fsm_transition):
         db.add(RiskScore(user_id=user.id, detection_id=detection.id, previous_score=previous,
             score=result["score"], created_at=row.created_at))
         db.flush()
+        from app.services.blocking import enforce_assessment
+        enforce_assessment(db, request, user, detection, result["score"])
     return detection
 
 
