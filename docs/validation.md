@@ -37,4 +37,21 @@ live WebSocket delivery, account/IP block and recovery, FSM playback and evaluat
 filter changes. Rerun the automated tests after any code/dependency changes.
 
 For presentation use [the walkthrough](demo-walkthrough.md) and
-[the viva guide](viva-guide.md). For production setup use the deployment guide.
+[the viva guide](viva-guide.md). For production setup use [the deployment guide](deployment.md).
+
+## Deployment verification
+
+The Render deployment change passed **116 backend tests** and **18 frontend tests**.
+The Docker multi-stage build completed, including real 10,000-session synthetic data
+creation, model training and a matching comparison report. Both compiled frontends
+were tested from that image through local HTTPS using `npm run test:deployment`.
+This verified secure admin cookies, bank actions and unchanged dummy balances,
+server-side account block/session denial/recovery, WebSocket alert delivery, real
+model reports, `/admin/` routes and deep-link reloads, the production simulation
+execution guard and mobile overflow. This is container validation; it is not a
+claim that a public Render service has already been created.
+
+After restarting the validation container, the attached volume retained all ten
+users, the administrator, 21 security events, two audit entries and one block-history
+record. The health endpoint passed after restart. Hosted proxy/IP verification and
+public Render reachability still require the actual Render service.

@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: protocolguard-ai
+    runtime: docker
+    plan: starter
+    region: singapore
+    numInstances: 1
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: checksPass
+    disk:
+      name: protocolguard-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PROTOCOLGUARD_ENV
+        value: production
+      - key: DATABASE_URL
+        value: sqlite:////var/data/protocolguard.db
+      - key: STATIC_DIRECTORY
+        value: /app/web
+      - key: SIMULATION_ENABLED
+        value: "false"
+      # Enable network enforcement only after verifying the trusted proxy topology.
+      - key: IP_AUTO_RESTRICT_ENABLED
+        value: "false"
+      - key: PROVISION_DEMO_ACCOUNTS
+        value: "true"
+      - key: DEMO_USER_PASSWORD
+        sync: false
+      - key: DEMO_ADMIN_PASSWORD
+        sync: false

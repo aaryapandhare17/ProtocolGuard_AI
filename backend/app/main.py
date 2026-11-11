@@ -56,6 +56,10 @@ def create_app(config=None) -> FastAPI:
     def health() -> dict[str, str]:
         return {"status": "ok", "service": "protocolguard-api"}
 
+    if config.static_directory:
+        from app.services.frontend import mount_frontends
+        mount_frontends(app, config.static_directory)
+
     return app
 
 

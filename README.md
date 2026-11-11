@@ -197,3 +197,13 @@ See the [lab guide](docs/simulation-lab.md) for scope, limits, APIs and developm
 
 Use the [demo walkthrough](docs/demo-walkthrough.md), [viva guide](docs/viva-guide.md)
 and [validation record](docs/validation.md) for the final project review.
+
+## Deploy on Render
+
+[Deploy this repository](https://render.com/deploy?repo=https://github.com/aaryapandhare17/ProtocolGuard_AI)
+using the included Docker/Blueprint configuration. It serves the bank at `/` and
+admin at `/admin/` with one API origin and a persistent disk. Read the
+[deployment guide](docs/deployment.md) for private account provisioning, the paid
+service/disk requirement, HTTPS, backups, proxy verification and browser smoke checks.
+Production lab execution and unverified automatic IP restrictions are disabled;
+account enforcement remains enabled.

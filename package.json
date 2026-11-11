@@ -9,6 +9,10 @@
     "dev:bank": "npm run dev --workspace @protocolguard/securebank",
     "dev:admin": "npm run dev --workspace @protocolguard/admin",
     "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces"
+    "test": "npm run test --workspaces",
+    "test:deployment": "node scripts/smoke-deployment.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
   }
 }
