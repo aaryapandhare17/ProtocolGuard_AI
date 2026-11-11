@@ -146,3 +146,44 @@ def test_render_origin_is_configured_before_server_starts(hosted, monkeypatch):
     hosted.cors_origins = "https://bank.example"
     deploy.main()
     assert hosted.cors_origins == "https://bank.example"
+
+
+def test_api_only_hosting_and_ordered_poll_pages(hosted):
+    api_only = hosted.model_copy(
+        update={"serve_frontends": False, "static_directory": None}
+    )
+    validate_hosting(api_only, "")
+    from app.seed import seed
+    from app.models.entities import SecurityEvent
+
+    instance = create_app(api_only)
+    with TestClient(instance, base_url="https://bank.example") as client:
+        seed(
+            instance.state.session_factory,
+            "hosted-bank-password",
+            "hosted-admin-password",
+        )
+        with instance.state.session_factory.begin() as db:
+            for i in range(7):
+                db.add(
+                    SecurityEvent(
+                        ip="192.0.2.10",
+                        event_type="VIEW_BALANCE",
+                        endpoint="/api/bank/balance",
+                        outcome="success",
+                    )
+                )
+        assert client.get("/").status_code == 404
+        assert client.get("/admin/").status_code == 404
+        assert client.get("/api/admin/events?order=asc").status_code == 401
+        login = client.post(
+            "/api/admin/auth/login",
+            json={"username": "admin", "password": "hosted-admin-password"},
+        )
+        assert login.status_code == 200
+        first = client.get("/api/admin/events?order=asc&limit=3").json()
+        second = client.get(
+            f"/api/admin/events?order=asc&limit=3&after_id={first[-1]['id']}"
+        ).json()
+        assert [r["id"] for r in first + second] == list(range(1, 7))
+        assert client.get("/api/admin/events?order=invalid").status_code == 422

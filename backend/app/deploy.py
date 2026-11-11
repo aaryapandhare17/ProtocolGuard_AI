@@ -28,7 +28,7 @@ def validate_hosting(config, trusted_proxies):
             raise ValueError(
                 "CORS_ORIGINS must contain exact HTTPS origins without trailing slashes"
             )
-    if not config.static_directory:
+    if config.serve_frontends and not config.static_directory:
         raise ValueError("STATIC_DIRECTORY must point to the compiled frontends")
     # Arbitrary clients must not be able to choose their observed security address.
     for proxy in filter(None, (entry.strip() for entry in trusted_proxies.split(","))):

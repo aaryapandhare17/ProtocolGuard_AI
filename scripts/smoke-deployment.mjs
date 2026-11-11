@@ -89,28 +89,49 @@ try {
   assert((await transfer).ok());
   const after = await (await bank.request.get(url("/api/bank/balance"))).json();
   assert.equal(after.balance_cents, before.balance_cents);
-  await admin.evaluate(
-    () =>
-      new Promise((resolve, reject) => {
-        window.smokeMessages = [];
-        const socket = new WebSocket(
-          `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/ws/admin/events`,
-        );
-        window.smokeSocket = socket;
-        socket.onerror = () => reject(Error("WebSocket connection failed"));
-        socket.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          window.smokeMessages.push(message);
-          if (message.type === "connected") resolve();
-        };
-        setTimeout(
-          () => reject(Error("WebSocket connection timed out")),
-          15000,
-        );
-      }),
-  );
+  const polling = process.env.SMOKE_LIVE_TRANSPORT === "poll";
+  if (!polling)
+    await admin.evaluate(
+      () =>
+        new Promise((resolve, reject) => {
+          window.smokeMessages = [];
+          const socket = new WebSocket(
+            `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/ws/admin/events`,
+          );
+          window.smokeSocket = socket;
+          socket.onerror = () => reject(Error("WebSocket connection failed"));
+          socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            window.smokeMessages.push(message);
+            if (message.type === "connected") resolve();
+          };
+          setTimeout(
+            () => reject(Error("WebSocket connection timed out")),
+            15000,
+          );
+        }),
+    );
   let blocked = false;
   try {
+    const latest = await api("/admin/events?limit=1");
+    const cursor = latest[0]?.id || 0;
+    const delivery = polling
+      ? admin.waitForResponse(async (response) => {
+          if (
+            !response.url().includes("/api/admin/events?") ||
+            !response.url().includes("order=asc") ||
+            !response.ok()
+          )
+            return false;
+          const rows = await response.json();
+          return rows.some(
+            (row) =>
+              row.id > cursor &&
+              row.event_type === "BLOCK_ACCOUNT" &&
+              row.user_id === actor.id,
+          );
+        })
+      : null;
     const result = await api(`/admin/users/${actor.id}/block`, {
       confirmed: true,
       note: "Deployment smoke verification",
@@ -120,15 +141,19 @@ try {
       .getByRole("button", { name: "View balance", exact: false })
       .click();
     await bank.getByRole("heading", { name: "Access restricted" }).waitFor();
-    await admin.waitForFunction(
-      (id) =>
-        window.smokeMessages.some(
-          (message) =>
-            message.type === "security_alerts" &&
-            message.alerts.some((alert) => alert.block_id === id),
-        ),
-      result.block_id,
-    );
+    if (polling) {
+      await delivery;
+      await admin.getByText("Polling", { exact: true }).first().waitFor();
+    } else
+      await admin.waitForFunction(
+        (id) =>
+          window.smokeMessages.some(
+            (message) =>
+              message.type === "security_alerts" &&
+              message.alerts.some((alert) => alert.block_id === id),
+          ),
+        result.block_id,
+      );
   } finally {
     if (blocked)
       await api(`/admin/users/${actor.id}/unblock`, {
@@ -183,7 +208,7 @@ try {
   }
   assert.deepEqual(errors, []);
   console.log(
-    "PASS: hosted banking, unchanged dummy balance, account block/denial/recovery, revoked session, live WebSocket alert, model reports, admin deep links/reloads, production lab guard and mobile layout.",
+    "PASS: hosted banking, unchanged dummy balance, account block/denial/recovery, revoked session, live alert delivery, model reports, admin deep links/reloads, production lab guard and mobile layout.",
   );
 } finally {
   await browser.close();

@@ -54,3 +54,9 @@ fitting; synthetic evaluation stays separate from operational history. See [anal
 The [simulation lab](simulation-lab.md) runs the same banking pipeline in disposable
 ASGI applications with separate SQLite databases. Only run snapshots and audit entries
 are persisted in the source database; sandbox activity never enters live event tables.
+
+The preferred split deployment uses one Vercel origin for both SPAs and a server-side
+API bridge to Railway's API-only image. Host-only login cookies remain on Vercel;
+no third-party cookie dependency is introduced. This build selects cursor-based
+HTTP polling while local/direct deployments retain WebSockets. See
+[Railway + Vercel](railway-vercel.md) for configuration and limitations.

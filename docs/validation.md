@@ -55,3 +55,18 @@ After restarting the validation container, the attached volume retained all ten
 users, the administrator, 21 security events, two audit entries and one block-history
 record. The health endpoint passed after restart. Hosted proxy/IP verification and
 public Render reachability still require the actual Render service.
+
+## Railway + Vercel verification
+
+The split-hosting change passed **117 backend tests**, **20 frontend tests** and
+**three API bridge tests**. Both SPAs built into the Vercel output with Admin's
+`/admin/` base and the authenticated polling transport. The Railway API-only Docker
+image built its own 10,000-session dataset, RF/IF artifacts and matching comparison
+report, then passed its health check.
+
+A local HTTPS preview exercised the actual Vercel API function against that separate
+Railway image. `test:deployment` passed in polling mode: cookies/login, CSRF-protected
+transfer with unchanged balance, account block and denied old session, polled block
+event delivery, unblock/fresh login, measured reports, admin deep-link reloads,
+production lab denial and mobile layout. This verifies the prepared split locally;
+public deployment still requires the owner's Railway/Vercel account setup and URLs.

@@ -20,6 +20,44 @@ export function useLive() {
         if (!stopped) setRevision((value) => value + 1);
       }, 300);
     };
+    if (import.meta.env.VITE_LIVE_TRANSPORT === "poll") {
+      let timer,
+        initialized = false;
+      async function poll() {
+        try {
+          const rows = await api(
+            initialized
+              ? `/admin/events?limit=200&after_id=${eventCursor}&order=asc`
+              : "/admin/events?limit=200",
+          );
+          if (stopped) return;
+          initialized = true;
+          eventCursor = Math.max(eventCursor, ...rows.map((row) => row.id));
+          setEvents((previous) =>
+            [
+              ...new Map(
+                [...rows, ...previous].map((row) => [row.id, row]),
+              ).values(),
+            ]
+              .sort((a, b) => b.id - a.id)
+              .slice(0, 200),
+          );
+          setStatus("Polling");
+          changed();
+        } catch (error) {
+          if (stopped) return;
+          setStatus(error.status === 403 ? "Restricted" : "Unavailable");
+          if (error.status === 401 || error.status === 403) return;
+        }
+        if (!stopped) timer = setTimeout(poll, 3000);
+      }
+      poll();
+      return () => {
+        stopped = true;
+        clearTimeout(timer);
+        clearTimeout(changeTimer);
+      };
+    }
     function connect() {
       if (stopped) return;
       const protocol = location.protocol === "https:" ? "wss:" : "ws:";

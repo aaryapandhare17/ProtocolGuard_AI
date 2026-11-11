@@ -10,9 +10,14 @@
     "dev:admin": "npm run dev --workspace @protocolguard/admin",
     "build": "npm run build --workspaces",
     "test": "npm run test --workspaces",
-    "test:deployment": "node scripts/smoke-deployment.mjs"
+    "test:deployment": "node scripts/smoke-deployment.mjs",
+    "build:vercel": "node scripts/build-vercel.mjs",
+    "test:proxy": "node --test scripts/tests/proxy.test.cjs"
   },
   "devDependencies": {
     "playwright": "^1.65.0"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }

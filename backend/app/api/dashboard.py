@@ -1,5 +1,7 @@
 """Read-only dashboard data from persisted banking/security activity."""
 
+from typing import Literal
+
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import select, func, or_
@@ -172,6 +174,7 @@ def events(
     q: str = Query("", max_length=80),
     user_id: int | None = None,
     after_id: int = Query(0, ge=0),
+    order: Literal["asc", "desc"] = "desc",
     before_id: int | None = Query(None, ge=1),
     limit: int = Query(100, ge=1, le=200),
     db=Depends(database),
@@ -191,5 +194,5 @@ def events(
         )
     return [
         serialize_event(*row)
-        for row in db.execute(query.order_by(SecurityEvent.id.desc()).limit(limit))
+        for row in db.execute(query.order_by(SecurityEvent.id.asc() if order == "asc" else SecurityEvent.id.desc()).limit(limit))
     ]

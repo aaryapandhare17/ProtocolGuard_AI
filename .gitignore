@@ -15,3 +15,4 @@ ml/datasets/*
 !ml/datasets/.gitkeep
 ml/evaluation/*
 !ml/evaluation/.gitkeep
+.vercel/
