@@ -198,11 +198,12 @@ See the [lab guide](docs/simulation-lab.md) for scope, limits, APIs and developm
 Use the [demo walkthrough](docs/demo-walkthrough.md), [viva guide](docs/viva-guide.md)
 and [validation record](docs/validation.md) for the final project review.
 
-## Deploy on Railway + Vercel
+## Free deployment without a payment card
 
-Follow the [Railway + Vercel guide](docs/railway-vercel.md). One Vercel project serves
-both frontends, with a same-origin API bridge to the Railway backend. The dashboard
-uses authenticated polling on Vercel; direct hosting retains WebSocket support.
-Railway requires a persistent volume and its usage/plan charges may apply.
+Follow [Vercel + Render Free + Neon Free](docs/free-deployment.md). Vercel serves both
+websites; Render's Free API service uses external Neon PostgreSQL, with no paid disk.
+The committed Blueprint explicitly selects `plan: free`. Free compute can sleep and
+usage/storage limits apply. See [PostgreSQL support](docs/postgresql.md) and
+[deployment operations](docs/deployment.md) for persistence, security and backups.
 
-The [Render configuration](docs/deployment.md) remains available as an alternative.
+The [Railway setup](docs/railway-vercel.md) remains an optional usage-based alternative.

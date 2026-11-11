@@ -70,3 +70,27 @@ transfer with unchanged balance, account block and denied old session, polled bl
 event delivery, unblock/fresh login, measured reports, admin deep-link reloads,
 production lab denial and mobile layout. This verifies the prepared split locally;
 public deployment still requires the owner's Railway/Vercel account setup and URLs.
+
+## No-card deployment verification
+
+The PostgreSQL/free-tier change passed **121 backend tests**, including actual
+PostgreSQL 16 schema, authentication, concurrent-user and restriction-history checks,
+plus **20 frontend tests** and **four API-bridge tests**. PostgreSQL tests use isolated
+schemas on a dedicated local/CI database, not a real Neon account.
+
+A local HTTPS Vercel-style preview exercised the actual API bridge against FastAPI
+with PostgreSQL and real models. The deployment browser check passed login/cookies,
+CSRF-protected actions, dummy balance preservation, block/denial/recovery, polled
+events, saved-model reports, admin deep links, the production lab guard and mobile
+layout. Ten users, one administrator, 21 events and two audits survived a backend
+restart without provisioning again.
+
+The PostgreSQL Docker image built successfully, including the driver, generated
+10,000-session synthetic dataset, trained detectors and matching comparison report.
+The default Blueprint now explicitly selects `plan: free` and has no disk.
+The proxy also handles a non-JSON hosting wake-up page as a retryable JSON error.
+
+Render/Neon free-plan terms and Hugging Face's Docker/networking restrictions were
+checked against their official documentation on 11 November 2026; links are in
+[the no-card guide](free-deployment.md). Public deployment, real Neon connectivity
+and account-specific signup requirements still need the owner's account setup.

@@ -1,28 +1,27 @@
+# Free API-only service. Persistent state lives in Neon, not a paid Render disk.
 services:
   - type: web
-    name: protocolguard-ai
+    name: protocolguard-api
     runtime: docker
-    plan: starter
+    plan: free
     region: singapore
-    numInstances: 1
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./deploy/postgres.Dockerfile
     dockerContext: .
     healthCheckPath: /api/health
     autoDeployTrigger: checksPass
-    disk:
-      name: protocolguard-data
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: PROTOCOLGUARD_ENV
         value: production
+      - key: SERVE_FRONTENDS
+        value: "false"
+      - key: REQUIRE_POSTGRES
+        value: "true"
       - key: DATABASE_URL
-        value: sqlite:////var/data/protocolguard.db
-      - key: STATIC_DIRECTORY
-        value: /app/web
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
       - key: SIMULATION_ENABLED
         value: "false"
-      # Enable network enforcement only after verifying the trusted proxy topology.
       - key: IP_AUTO_RESTRICT_ENABLED
         value: "false"
       - key: PROVISION_DEMO_ACCOUNTS

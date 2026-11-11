@@ -1,6 +1,8 @@
 # Railway backend + Vercel frontend
 
-This is the preferred split deployment. One Vercel project serves SecureBank at `/`
+For the current no-card setup use [Vercel + Render Free + Neon](free-deployment.md).
+
+This is an optional usage-based split deployment. One Vercel project serves SecureBank at `/`
 and ProtocolGuard Admin at `/admin/`. One Railway service runs FastAPI, the loaded
 ML models and SQLite on an attached volume. No custom domain is required.
 

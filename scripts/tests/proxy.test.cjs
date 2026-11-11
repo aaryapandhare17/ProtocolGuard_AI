@@ -119,3 +119,26 @@ test("returns clear configuration, payload and upstream failures", async () => {
     else process.env.BACKEND_ORIGIN = originalOrigin;
   }
 });
+
+test("converts a hosting wake-up page into retryable API feedback", async () => {
+  const originalFetch = global.fetch,
+    originalOrigin = process.env.BACKEND_ORIGIN;
+  process.env.BACKEND_ORIGIN = "https://backend.test";
+  global.fetch = async () =>
+    new Response("<html>Hosting loading page</html>", {
+      status: 503,
+      headers: { "content-type": "text/html" },
+    });
+  try {
+    const out = response();
+    await proxy({ method: "GET", url: "/api/health", headers: {} }, out);
+    assert.equal(out.statusCode, 503);
+    assert.equal(out.headers["Retry-After"], "10");
+    assert(out.body.detail.includes("starting"));
+    assert(!JSON.stringify(out.body).includes("<html>"));
+  } finally {
+    global.fetch = originalFetch;
+    if (originalOrigin === undefined) delete process.env.BACKEND_ORIGIN;
+    else process.env.BACKEND_ORIGIN = originalOrigin;
+  }
+});

@@ -77,6 +77,21 @@ async function proxy(request, response) {
       redirect: "manual",
       signal: AbortSignal.timeout(25000),
     });
+    if (
+      [502, 503, 504].includes(upstream.status) &&
+      !upstream.headers.get("content-type")?.includes("application/json")
+    ) {
+      response.setHeader(
+        "Retry-After",
+        upstream.headers.get("retry-after") || "10",
+      );
+      return response
+        .status(503)
+        .json({
+          detail:
+            "Backend is starting or temporarily unavailable. Please retry shortly.",
+        });
+    }
     response.status(upstream.status);
     for (const name of ["content-type", "allow", "retry-after"]) {
       const value = upstream.headers.get(name);
@@ -97,13 +112,11 @@ async function proxy(request, response) {
     );
   } catch (error) {
     const oversized = error.message === "PAYLOAD_LIMIT";
-    response
-      .status(oversized ? 413 : 502)
-      .json({
-        detail: oversized
-          ? "Request is too large"
-          : "Backend is temporarily unavailable",
-      });
+    response.status(oversized ? 413 : 502).json({
+      detail: oversized
+        ? "Request is too large"
+        : "Backend is temporarily unavailable",
+    });
   }
 }
 module.exports = proxy;

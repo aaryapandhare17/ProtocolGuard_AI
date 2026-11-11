@@ -60,3 +60,8 @@ API bridge to Railway's API-only image. Host-only login cookies remain on Vercel
 no third-party cookie dependency is introduced. This build selects cursor-based
 HTTP polling while local/direct deployments retain WebSockets. See
 [Railway + Vercel](railway-vercel.md) for configuration and limitations.
+
+The no-card Blueprint now selects Render Free compute and external Neon PostgreSQL.
+It does not attach a paid Render disk. PostgreSQL transaction-scoped advisory locks
+preserve serialized security updates; SQLite remains available locally. See the
+[free deployment guide](free-deployment.md) and [database design](postgresql.md).

@@ -44,3 +44,5 @@ Integration tests create and remove uniquely named test schemas. They do not dro
 existing application tables. Use a dedicated local/CI PostgreSQL database with
 schema-creation permission; do not run this against a live customer database.
 GitHub Actions supplies a temporary PostgreSQL 16 service for these checks.
+
+For the no-card hosting plan, see [Vercel + Render Free + Neon](free-deployment.md).

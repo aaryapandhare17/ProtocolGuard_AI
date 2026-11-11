@@ -76,3 +76,28 @@ jobs:
       - name: Cleanup
         if: always()
         run: docker rm -f protocolguard-railway-ci
+  postgres-container:
+    runs-on: ubuntu-latest
+    needs: [backend, frontends]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f deploy/postgres.Dockerfile -t protocolguard-postgres-ci .
+      - name: Verify API startup against persistent PostgreSQL
+        run: |
+          docker network create protocolguard-ci
+          docker run -d --name database --network protocolguard-ci -e POSTGRES_PASSWORD=local-test-only-password -e POSTGRES_DB=protocolguard_test postgres:16-alpine
+          for attempt in $(seq 1 30); do
+            if docker exec database pg_isready -U postgres; then break; fi
+            sleep 1
+          done
+          docker run -d --name protocolguard-postgres-ci --network protocolguard-ci -p 127.0.0.1:10000:10000 -e DATABASE_URL=postgresql://postgres:local-test-only-password@database:5432/protocolguard_test -e CORS_ORIGINS=https://example.vercel.app protocolguard-postgres-ci
+          curl --fail --retry 30 --retry-delay 1 --retry-connrefused http://127.0.0.1:10000/api/health
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:10000/)" = "404"
+      - name: Container logs
+        if: failure()
+        run: docker logs protocolguard-postgres-ci
+      - name: Cleanup
+        if: always()
+        run: |
+          docker rm -f protocolguard-postgres-ci database
+          docker network rm protocolguard-ci
