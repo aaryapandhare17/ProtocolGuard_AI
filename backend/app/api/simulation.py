@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.api.blocking import ConfirmedAction
 from app.api.routes import admin_identity, database
-from app.database.store import now
+from app.database.store import begin_security_transaction, now
 from app.models.entities import SimulationRun, User
 from app.security.risk import RiskPolicy
 from app.services.blocking import audit, settings
@@ -151,8 +151,7 @@ async def run(
                 "error": f"Simulation could not complete ({type(error).__name__})."
             }
             status = "failed"
-        if db.bind.dialect.name == "sqlite":
-            db.connection().exec_driver_sql("BEGIN IMMEDIATE")
+        begin_security_transaction(db)
         record.result = json.dumps(result, allow_nan=False)
         record.status = status
         record.finished_at = now()

@@ -4,7 +4,7 @@ import secrets
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select, func
-from app.database.store import now
+from app.database.store import begin_security_transaction, now
 from app.models.entities import Admin, User, Session, SecurityEvent
 from app.security.credentials import digest, verify_password, hash_password
 from app.services.events import record
@@ -15,9 +15,8 @@ DUMMY_HASH = hash_password(secrets.token_urlsafe(32))
 
 def database(request: Request):
     with request.app.state.session_factory() as db:
-        # Serialize SQLite write transactions, including risk/session updates.
-        if db.bind.dialect.name == "sqlite":
-            db.connection().exec_driver_sql("BEGIN IMMEDIATE")
+        # Serialize security updates on SQLite and PostgreSQL.
+        begin_security_transaction(db)
         try:
             yield db
             db.commit()

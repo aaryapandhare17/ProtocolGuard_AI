@@ -4,7 +4,7 @@ import asyncio
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 from starlette.concurrency import run_in_threadpool
 from sqlalchemy import select
-from app.database.store import now
+from app.database.store import begin_security_transaction, now
 from app.models.entities import Admin, SecurityAlert, Session, IPSecurityAlert
 from app.security.credentials import digest
 from app.services.blocking import serialize_alert
@@ -28,11 +28,11 @@ def authorized(ws, db):
 
 
 def poll(ws, cursor, ip_cursor, event_cursor=None):
-    # This runs in a worker: SQLite transaction waits never stall the event loop.
+    # This runs in a worker: Database transaction waits never stall the event loop.
     with ws.app.state.session_factory() as db:
         address = connection_ip(ws.scope)
-        if address and db.bind.dialect.name == "sqlite":
-            db.connection().exec_driver_sql("BEGIN IMMEDIATE")
+        if address:
+            begin_security_transaction(db)
         denied = bool(active_restriction(db, address)) if address else False
         valid = authorized(ws, db) and not denied
         ip_batch = (

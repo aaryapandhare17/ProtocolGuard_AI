@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     protocolguard_env: str = "development"
+    require_postgres: bool = False
     serve_frontends: bool = True
     static_directory: str | None = None
     database_url: str = "sqlite:///./protocolguard.db"

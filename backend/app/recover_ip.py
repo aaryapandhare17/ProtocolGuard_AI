@@ -2,7 +2,7 @@
 import argparse
 from sqlalchemy import select
 from app.core.config import settings
-from app.database.store import configure
+from app.database.store import begin_security_transaction, configure
 from app.models.entities import SuspiciousIP
 from app.security.ip import canonical_ip
 from app.services.ips import unblock_ip
@@ -15,8 +15,7 @@ def recover(factory,address,note,*,environment,confirmed=False):
         raise ValueError('Use explicit confirmation and a note of 3–500 characters')
     address=canonical_ip(address)
     with factory() as db:
-        if db.bind.dialect.name=='sqlite':
-            db.connection().exec_driver_sql('BEGIN IMMEDIATE')
+        begin_security_transaction(db)
         ip=db.scalar(select(SuspiciousIP).where(SuspiciousIP.address==address))
         if not ip:
             raise ValueError('No record for this IP address')

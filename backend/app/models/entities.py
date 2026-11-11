@@ -78,7 +78,7 @@ class SecuritySettings(Base):
 
 class BlockedEntity(Base):
     __tablename__ = "blocked_entities"
-    __table_args__ = (Index("uq_active_account_block", "user_id", unique=True, sqlite_where=text("active = 1")),)
+    __table_args__ = (Index("uq_active_account_block", "user_id", unique=True, sqlite_where=text("active = 1"), postgresql_where=text("active IS TRUE")),)
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     entity_type: Mapped[str] = mapped_column(default="account")
@@ -145,7 +145,7 @@ class IPAccount(Base):
 
 class IPRestriction(Base):
     __tablename__ = "ip_restrictions"
-    __table_args__ = (Index("uq_active_ip_restriction","ip_id",unique=True,sqlite_where=text("active = 1")),)
+    __table_args__ = (Index("uq_active_ip_restriction","ip_id",unique=True,sqlite_where=text("active = 1"), postgresql_where=text("active IS TRUE")),)
     id: Mapped[int] = mapped_column(primary_key=True)
     ip_id: Mapped[int] = mapped_column(ForeignKey("suspicious_ips.id"),index=True)
     active: Mapped[bool] = mapped_column(default=True)

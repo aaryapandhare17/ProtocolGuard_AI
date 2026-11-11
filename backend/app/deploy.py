@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 import uvicorn
 
 from app.core.config import settings
-from app.database.store import Base, configure
+from app.database.store import Base, configure, database_url
 from app.seed import seed
 
 
@@ -28,6 +28,11 @@ def validate_hosting(config, trusted_proxies):
             raise ValueError(
                 "CORS_ORIGINS must contain exact HTTPS origins without trailing slashes"
             )
+    if (
+        config.require_postgres
+        and database_url(config.database_url).get_backend_name() != "postgresql"
+    ):
+        raise ValueError("This deployment requires an external PostgreSQL DATABASE_URL")
     if config.serve_frontends and not config.static_directory:
         raise ValueError("STATIC_DIRECTORY must point to the compiled frontends")
     # Arbitrary clients must not be able to choose their observed security address.
