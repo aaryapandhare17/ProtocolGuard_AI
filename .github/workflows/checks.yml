@@ -50,7 +50,7 @@ jobs:
       - name: Verify production image serves both apps and API
         run: |
           docker run -d --name protocolguard-ci -p 127.0.0.1:10000:10000 -e CORS_ORIGINS=https://example.com -e IP_AUTO_RESTRICT_ENABLED=false protocolguard-ci
-          curl --fail --retry 20 --retry-delay 1 --retry-connrefused http://127.0.0.1:10000/api/health
+          curl --fail --retry 20 --retry-delay 1 --retry-connrefused --retry-all-errors --connect-timeout 2 --max-time 5 --retry-max-time 60 http://127.0.0.1:10000/api/health
           curl --fail http://127.0.0.1:10000/login
           curl --fail http://127.0.0.1:10000/admin/users
       - name: Container logs
@@ -68,7 +68,7 @@ jobs:
       - name: Verify API-only image
         run: |
           docker run -d --name protocolguard-railway-ci -p 127.0.0.1:10000:10000 -e CORS_ORIGINS=https://example.vercel.app protocolguard-railway-ci
-          curl --fail --retry 20 --retry-delay 1 --retry-connrefused http://127.0.0.1:10000/api/health
+          curl --fail --retry 20 --retry-delay 1 --retry-connrefused --retry-all-errors --connect-timeout 2 --max-time 5 --retry-max-time 60 http://127.0.0.1:10000/api/health
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:10000/)" = "404"
       - name: Container logs
         if: failure()
@@ -91,7 +91,7 @@ jobs:
             sleep 1
           done
           docker run -d --name protocolguard-postgres-ci --network protocolguard-ci -p 127.0.0.1:10000:10000 -e DATABASE_URL=postgresql://postgres:local-test-only-password@database:5432/protocolguard_test -e CORS_ORIGINS=https://example.vercel.app protocolguard-postgres-ci
-          curl --fail --retry 30 --retry-delay 1 --retry-connrefused http://127.0.0.1:10000/api/health
+          curl --fail --retry 30 --retry-delay 1 --retry-connrefused --retry-all-errors --connect-timeout 2 --max-time 5 --retry-max-time 60 http://127.0.0.1:10000/api/health
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:10000/)" = "404"
       - name: Container logs
         if: failure()

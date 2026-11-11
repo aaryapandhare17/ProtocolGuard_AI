@@ -94,3 +94,9 @@ Render/Neon free-plan terms and Hugging Face's Docker/networking restrictions we
 checked against their official documentation on 11 November 2026; links are in
 [the no-card guide](free-deployment.md). Public deployment, real Neon connectivity
 and account-specific signup requirements still need the owner's account setup.
+
+The initial GitHub container smoke probes reported a receive/reset error before
+application startup was ready. A local production-image probe reproduced an empty
+reply on its first request, followed by a successful health response once startup
+finished. CI health probes now retry all transient curl failures with bounded
+connection/request/retry timeouts; connection-refused retries alone were insufficient.
