@@ -192,3 +192,8 @@ The admin sidebar opens six fixed scenarios using disposable copies of `demo01`â
 Runs execute real handlers, support simultaneous actors and shared virtual IPs, and save
 request traces, detector evidence and restriction outcomes without changing live bank records.
 See the [lab guide](docs/simulation-lab.md) for scope, limits, APIs and development configuration.
+
+## Presentation and validation
+
+Use the [demo walkthrough](docs/demo-walkthrough.md), [viva guide](docs/viva-guide.md)
+and [validation record](docs/validation.md) for the final project review.
