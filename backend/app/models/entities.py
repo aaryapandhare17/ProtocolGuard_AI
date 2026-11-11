@@ -166,3 +166,15 @@ class IPSecurityAlert(Base):
     evidence: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(default=now)
     resolved_at: Mapped[datetime | None]
+
+
+class SimulationRun(Base):
+    __tablename__ = "simulation_runs"
+    id: Mapped[str] = mapped_column(String(32),primary_key=True)
+    admin_id: Mapped[int] = mapped_column(ForeignKey("admin_users.id"),index=True)
+    scenario: Mapped[str]
+    status: Mapped[str] = mapped_column(default="running",index=True)
+    configuration: Mapped[str] = mapped_column(Text)
+    result: Mapped[str] = mapped_column(Text,default="{}")
+    started_at: Mapped[datetime] = mapped_column(default=now)
+    finished_at: Mapped[datetime | None]

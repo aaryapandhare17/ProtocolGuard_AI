@@ -25,7 +25,7 @@ An ASGI gateway enforces IP restrictions before routes and protects WebSocket co
 IP state remains independent of account state, with a development-only recovery CLI.
 SQLite write transactions are serialized with BEGIN IMMEDIATE to avoid lost updates.
 
-Planned event path: verified session → banking action → persisted security event →
+Implemented event path: verified session → banking action → persisted security event →
 analytical DFA and ML inference → hybrid risk evidence → backend block policy → admin WebSocket update.
 Authorization remains independent of the analytical DFA. Account and IP risk remain separate.
 Training uses reproducible synthetic sessions; reported metrics must come from executed evaluation.
@@ -50,3 +50,7 @@ through persisted transition snapshots without issuing banking actions. See the
 The ML analytics/comparison pages read verified saved reports and bounded persisted model
 predictions. A separate CLI compares frozen detectors on identical observations without
 fitting; synthetic evaluation stays separate from operational history. See [analytics](ml-analytics.md).
+
+The [simulation lab](simulation-lab.md) runs the same banking pipeline in disposable
+ASGI applications with separate SQLite databases. Only run snapshots and audit entries
+are persisted in the source database; sandbox activity never enters live event tables.

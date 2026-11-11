@@ -27,11 +27,11 @@ in again. Logout revokes the admin session and unmounts the monitoring connectio
 | Security alerts | Account and IP incidents, unresolved/history views, evidence inspection, account-alert resolution and IP release |
 | ML analytics | Saved RF/IF metrics, confusion matrices, feature importances, and separate recent live prediction history |
 | Detector comparison | Verified same-cohort FSM/RF/IF/hybrid results, timing, frozen policy and provenance |
+| Simulation lab | Six isolated scenarios, up to ten simultaneous demo actors, shared virtual IPs, saved traces and sandbox evidence |
 | Settings | Confirmed persistent threshold/enablement changes, model availability, risk weights and administrator/system audit records |
 
-The simulation lab is explicitly
-marked as upcoming and disabled. There are no invented metrics or substitute charts for
-that feature. Model training statistics are not mixed into the live overview.
+The [simulation lab](simulation-lab.md) exports separately labeled sandbox results.
+Model training statistics and sandbox activity are not mixed into the live overview.
 
 ## Security actions
 

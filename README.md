@@ -22,8 +22,9 @@ recovery are implemented. The dark admin dashboard now provides verified login, 
 account/IP management, alerts, risk histories, security settings, and audit logs.
 Interactive FSM visualization and read-only recorded-session replay are implemented.
 ML analytics and four-detector comparison now show measured synthetic evaluation and
-separate live prediction history. The controlled simulation lab remains planned;
-the admin app currently shows development status. Banking balances are seeded dummy data;
+separate live prediction history. The controlled simulation lab executes six local
+scenarios with up to ten isolated demo actors and saved, labeled evidence.
+Banking balances are seeded dummy data;
 activity comes from persisted security events.
 
 ## Requirements
@@ -71,7 +72,7 @@ See `.env.example`: `PROTOCOLGUARD_ENV` identifies the environment;
 allowlist. Run the backend from the repository root to load `.env` consistently.
 Never commit `.env`, credentials, local databases, or generated model artifacts.
 
-See [architecture](docs/architecture.md) for the planned event pipeline and implementation sequence.
+See [architecture](docs/architecture.md) for the event pipeline and implementation sequence.
 
 Full requirements: [project brief](docs/project-brief.md).
 
@@ -165,7 +166,7 @@ headers by default. If you restrict the shared local IP, use the documented deve
 Open http://localhost:5174 and sign in with the provisioned administrator credentials.
 See the [dashboard guide](docs/admin-dashboard.md) and [monitoring API reference](docs/admin-api.md)
 for pages, security controls, live connection behavior, development proxies, and screenshot steps.
-All metrics and charts come from persisted backend data. The upcoming simulation lab is explicitly disabled until its separate feature is implemented.
+All metrics and charts come from persisted backend data. The [simulation lab](docs/simulation-lab.md) keeps its sandbox evidence separate from live monitoring.
 
 ## FSM visualizer
 
@@ -184,3 +185,10 @@ recent operational predictions, and a same-cohort comparison of FSM/RF/IF/hybrid
 See [analytics setup and interpretation](docs/ml-analytics.md) and the
 [executed comparison report](docs/detector-comparison.json). Missing reports show an explicit
 unavailable state. Evaluation commands do not retrain models or modify banking records.
+
+## Controlled simulation lab
+
+The admin sidebar opens six fixed scenarios using disposable copies of `demo01`–`demo10`.
+Runs execute real handlers, support simultaneous actors and shared virtual IPs, and save
+request traces, detector evidence and restriction outcomes without changing live bank records.
+See the [lab guide](docs/simulation-lab.md) for scope, limits, APIs and development configuration.

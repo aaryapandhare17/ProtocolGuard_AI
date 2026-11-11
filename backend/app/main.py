@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from threading import BoundedSemaphore
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
@@ -14,6 +15,7 @@ from app.api.ips import router as ip_router
 from app.api.dashboard import router as dashboard_router
 from app.api.analytics import router as analytics_router
 from app.security.gateway import IPGateway
+from app.api.simulation import router as simulation_router
 
 
 def create_app(config=None) -> FastAPI:
@@ -31,6 +33,7 @@ def create_app(config=None) -> FastAPI:
         engine.dispose()
 
     app = FastAPI(title="ProtocolGuard AI", version="0.2.0", lifespan=lifespan)
+    app.state.simulation_slots = BoundedSemaphore(2)
     app.state.detector = None
     app.state.ml_status = "not_initialized"
     app.state.settings = config
@@ -46,6 +49,7 @@ def create_app(config=None) -> FastAPI:
     app.include_router(ip_router)
     app.include_router(dashboard_router)
     app.include_router(analytics_router)
+    app.include_router(simulation_router)
     app.add_middleware(IPGateway,factory=factory,config=config)
 
     @app.get("/api/health", tags=["health"])

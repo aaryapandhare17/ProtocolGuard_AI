@@ -29,6 +29,7 @@ import { useLive } from "./hooks/useLive";
 import { Brand } from "./components/UI";
 import ConfirmDialog from "./components/ConfirmDialog";
 import Login from "./pages/Login";
+const Simulation = lazy(() => import("./pages/Simulation"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Comparison = lazy(() => import("./pages/Comparison"));
 const FSM = lazy(() => import("./pages/FSM"));
@@ -51,7 +52,6 @@ const navigation = [
   ["Suspicious IPs", "/ips", Globe],
   ["Security alerts", "/alerts", Bell],
 ];
-const planned = [["Simulation lab", TestTube2]];
 function describe(action) {
   if (action.kind === "account_block")
     return {
@@ -128,15 +128,17 @@ function Dashboard({ identity, onLogout }) {
         ? location.pathname === "/"
         : location.pathname.startsWith(path),
     )?.[0] ||
-    (location.pathname.startsWith("/analytics")
-      ? "ML analytics"
-      : location.pathname.startsWith("/comparison")
-        ? "Detector comparison"
-        : location.pathname.startsWith("/fsm")
-          ? "FSM visualizer"
-          : location.pathname.startsWith("/settings")
-            ? "Settings"
-            : "Security operations");
+    (location.pathname.startsWith("/simulation")
+      ? "Simulation lab"
+      : location.pathname.startsWith("/analytics")
+        ? "ML analytics"
+        : location.pathname.startsWith("/comparison")
+          ? "Detector comparison"
+          : location.pathname.startsWith("/fsm")
+            ? "FSM visualizer"
+            : location.pathname.startsWith("/settings")
+              ? "Settings"
+              : "Security operations");
   return (
     <div className="admin-shell">
       <aside className={`sidebar ${mobile ? "open" : ""}`}>
@@ -169,13 +171,10 @@ function Dashboard({ identity, onLogout }) {
             <SlidersHorizontal size={17} />
             Detector comparison
           </NavLink>
-          {planned.map(([label, Icon]) => (
-            <button key={label} disabled title="Planned in an upcoming feature">
-              <Icon size={17} />
-              {label}
-              <small>Next</small>
-            </button>
-          ))}
+          <NavLink to="/simulation">
+            <TestTube2 size={17} />
+            Simulation lab
+          </NavLink>
           <NavLink to="/settings">
             <SettingsIcon size={17} />
             Settings
@@ -270,6 +269,7 @@ function Dashboard({ identity, onLogout }) {
           >
             <Routes>
               <Route path="/" element={<Overview live={live} />} />
+              <Route path="/simulation" element={<Simulation />} />
               <Route path="/analytics" element={<Analytics live={live} />} />
               <Route path="/comparison" element={<Comparison live={live} />} />
               <Route path="/fsm" element={<FSM live={live} />} />
