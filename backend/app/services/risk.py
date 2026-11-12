@@ -69,7 +69,8 @@ def model_evidence(db, app, row, recent, policy):
             failures.append({"context": context, "reason": type(error).__name__})
     rf = max((result["prediction"]["random_forest"]["score"] for result in predictions), default=0.0)
     isolation = max((result["prediction"]["isolation_forest"]["anomaly_evidence"] for result in predictions), default=0.0)
-    return {"status": "inference_failed" if failures else "ready" if predictions else "insufficient_observation",
+    return {"artifact_sha256": getattr(detector, "artifact_sha256", None),
+        "status": "inference_failed" if failures else "ready" if predictions else "insufficient_observation",
         "predictions": predictions, "failures": failures, "skipped": skipped}, rf, isolation
 
 

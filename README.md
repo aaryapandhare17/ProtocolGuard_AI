@@ -114,7 +114,7 @@ The FSM analyzes protocol order; verified sessions and backend authorization sti
 With the backend environment activated, from the repository root:
 
 ```sh
-python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v1
+python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v2
 ```
 
 This creates ignored JSONL sessions, feature CSV, and a versioned manifest. Existing
@@ -126,8 +126,8 @@ See the model training commands below for actual evaluation.
 
 ```sh
 python -m pip install -e "backend[dev,ml]"
-python -m app.ml.train --dataset ml/datasets/bank-v1 --output ml/artifacts/bank-v1
-python -m app.ml.evaluate --dataset ml/datasets/bank-v1 --artifacts ml/artifacts/bank-v1 --output ml/evaluation/bank-v1.json
+python -m app.ml.train --dataset ml/datasets/bank-v2 --output ml/artifacts/bank-v2
+python -m app.ml.evaluate --dataset ml/datasets/bank-v2 --artifacts ml/artifacts/bank-v2 --output ml/evaluation/bank-v2.json
 ```
 
 Use new output paths when repeating runs. [Model documentation](docs/ml-models.md)
@@ -177,7 +177,7 @@ partial-history behavior, user-detail links, and read-only guarantees.
 ## ML analytics and detector comparison
 
 ```sh
-python -m app.ml.compare --dataset ml/datasets/bank-v1 --artifacts ml/artifacts/bank-v1 --output ml/evaluation/comparison-v1.json
+python -m app.ml.compare --dataset ml/datasets/bank-v2 --artifacts ml/artifacts/bank-v2 --output ml/evaluation/comparison-v2.json
 ```
 
 The admin sidebar now opens measured model metrics, confusion matrices, feature importance,
@@ -207,3 +207,10 @@ usage/storage limits apply. See [PostgreSQL support](docs/postgresql.md) and
 [deployment operations](docs/deployment.md) for persistence, security and backups.
 
 The [Railway setup](docs/railway-vercel.md) remains an optional usage-based alternative.
+
+## Login timing model update
+
+The v2 release broadens login latency/pacing coverage while retaining risk-only
+blocking at 60. See [the release and validation notes](docs/login-model-v2.md) for
+the 15-failures-within-60-seconds target, benign retry controls, measured results,
+remaining limitations and Render deployment verification.

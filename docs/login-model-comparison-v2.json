@@ -1,0 +1,202 @@
+{
+  "baseline": {
+    "failed_login_burst": {
+      "samples": 65,
+      "blocked": 39,
+      "positive": true
+    },
+    "failed_login_paced": {
+      "samples": 142,
+      "blocked": 0,
+      "positive": true
+    },
+    "heldout_delayed_retry": {
+      "samples": 337,
+      "blocked": 0,
+      "positive": false
+    },
+    "heldout_jittered_login_failures": {
+      "samples": 312,
+      "blocked": 0,
+      "positive": true
+    },
+    "heldout_paced_transfer": {
+      "samples": 314,
+      "blocked": 0,
+      "positive": true
+    },
+    "heldout_slow_normal": {
+      "samples": 339,
+      "blocked": 0,
+      "positive": false
+    },
+    "invalid_sequence": {
+      "samples": 76,
+      "blocked": 76,
+      "positive": true
+    },
+    "normal_browsing": {
+      "samples": 311,
+      "blocked": 0,
+      "positive": false
+    },
+    "normal_busy": {
+      "samples": 71,
+      "blocked": 0,
+      "positive": false
+    },
+    "normal_retry": {
+      "samples": 132,
+      "blocked": 0,
+      "positive": false
+    },
+    "normal_transfer": {
+      "samples": 202,
+      "blocked": 0,
+      "positive": false
+    },
+    "rapid_requests": {
+      "samples": 98,
+      "blocked": 16,
+      "positive": true
+    },
+    "transfer_burst": {
+      "samples": 112,
+      "blocked": 112,
+      "positive": true
+    },
+    "unauthorized_access": {
+      "samples": 110,
+      "blocked": 110,
+      "positive": true
+    },
+    "overall": {
+      "samples": 2621,
+      "accuracy": 0.6657764212132774,
+      "precision": 1.0,
+      "recall": 0.2872253864930838,
+      "f1": 0.44627054361567636,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          1392,
+          0
+        ],
+        [
+          876,
+          353
+        ]
+      ],
+      "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]"
+    }
+  },
+  "candidate": {
+    "failed_login_burst": {
+      "samples": 65,
+      "blocked": 65,
+      "positive": true
+    },
+    "failed_login_paced": {
+      "samples": 142,
+      "blocked": 142,
+      "positive": true
+    },
+    "heldout_delayed_retry": {
+      "samples": 337,
+      "blocked": 0,
+      "positive": false
+    },
+    "heldout_jittered_login_failures": {
+      "samples": 312,
+      "blocked": 312,
+      "positive": true
+    },
+    "heldout_paced_transfer": {
+      "samples": 314,
+      "blocked": 0,
+      "positive": true
+    },
+    "heldout_slow_normal": {
+      "samples": 339,
+      "blocked": 0,
+      "positive": false
+    },
+    "invalid_sequence": {
+      "samples": 76,
+      "blocked": 76,
+      "positive": true
+    },
+    "normal_browsing": {
+      "samples": 311,
+      "blocked": 0,
+      "positive": false
+    },
+    "normal_busy": {
+      "samples": 71,
+      "blocked": 0,
+      "positive": false
+    },
+    "normal_retry": {
+      "samples": 132,
+      "blocked": 0,
+      "positive": false
+    },
+    "normal_transfer": {
+      "samples": 202,
+      "blocked": 0,
+      "positive": false
+    },
+    "rapid_requests": {
+      "samples": 98,
+      "blocked": 95,
+      "positive": true
+    },
+    "transfer_burst": {
+      "samples": 112,
+      "blocked": 112,
+      "positive": true
+    },
+    "unauthorized_access": {
+      "samples": 110,
+      "blocked": 110,
+      "positive": true
+    },
+    "overall": {
+      "samples": 2621,
+      "accuracy": 0.8790537962609691,
+      "precision": 1.0,
+      "recall": 0.74206672091131,
+      "f1": 0.8519383465670247,
+      "false_positive_rate": 0.0,
+      "confusion_matrix": [
+        [
+          1392,
+          0
+        ],
+        [
+          317,
+          912
+        ]
+      ],
+      "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]"
+    }
+  },
+  "provenance": {
+    "dataset": {
+      "features.csv": {
+        "bytes": 6096850,
+        "sha256": "c53a70b8d555fe4a37288555485c786777f2327c36a4135b85922e53f6341af8"
+      },
+      "sessions.jsonl": {
+        "bytes": 22464346,
+        "sha256": "4c013cf77952ac639d4e372c7c7fa1e4c68f08e6432f357fc0087363fb6b49a3"
+      }
+    },
+    "baseline_model_sha256": "a9f75b5e364702014ed00c0e64df427d300d212b8bb5d2e84aff2a55f03cbdd3",
+    "candidate_model_sha256": "a9b61b550b68ed9bf0087dc842e141a8fbfd8aeeed14609a8429583d733978b5",
+    "scope": "Identical v2 complete test plus held-out observations; instantaneous hybrid snapshots, not live enforcement or prior-score retention.",
+    "threshold": 60,
+    "policy_unchanged": true,
+    "synthetic_only": true
+  }
+}

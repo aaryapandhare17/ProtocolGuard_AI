@@ -1,0 +1,899 @@
+{
+  "dataset": {
+    "files": {
+      "features.csv": {
+        "bytes": 6096850,
+        "sha256": "c53a70b8d555fe4a37288555485c786777f2327c36a4135b85922e53f6341af8"
+      },
+      "sessions.jsonl": {
+        "bytes": 22464346,
+        "sha256": "4c013cf77952ac639d4e372c7c7fa1e4c68f08e6432f357fc0087363fb6b49a3"
+      }
+    },
+    "seed": 42,
+    "sessions": 10000,
+    "split_sessions": {
+      "held_out": 1302,
+      "test": 1319,
+      "train": 6050,
+      "validation": 1329
+    }
+  },
+  "feature_schema": {
+    "feature_names": [
+      "event_count",
+      "login_failure_count",
+      "transfer_attempt_count",
+      "invalid_transition_count",
+      "invalid_transition_rate",
+      "session_duration_seconds",
+      "request_frequency",
+      "average_inter_event_seconds",
+      "minimum_inter_event_seconds",
+      "short_interval_ratio",
+      "distinct_endpoint_count",
+      "unknown_event_count",
+      "event_fraction:LOGIN_ATTEMPT",
+      "event_fraction:LOGIN_SUCCESS",
+      "event_fraction:LOGIN_FAILED",
+      "event_fraction:VIEW_BALANCE",
+      "event_fraction:VIEW_HISTORY",
+      "event_fraction:TRANSFER_REQUEST",
+      "event_fraction:TRANSFER_RECORDED",
+      "event_fraction:RETURN",
+      "event_fraction:CANCEL_TRANSFER",
+      "event_fraction:LOGOUT",
+      "event_fraction:UNAUTHORIZED_REQUEST",
+      "event_fraction:RATE_LIMIT_TRIGGERED",
+      "event_fraction:ACCESS_BLOCKED",
+      "event_fraction:BLOCK_ACCOUNT",
+      "transition_fraction:LOGGED_OUT:LOGGED_OUT",
+      "transition_fraction:LOGGED_OUT:AUTHENTICATING",
+      "transition_fraction:LOGGED_OUT:AUTHENTICATED",
+      "transition_fraction:LOGGED_OUT:VIEWING_ACCOUNT",
+      "transition_fraction:LOGGED_OUT:TRANSFER_PENDING",
+      "transition_fraction:LOGGED_OUT:CLOSED",
+      "transition_fraction:LOGGED_OUT:BLOCKED",
+      "transition_fraction:LOGGED_OUT:REJECTED",
+      "transition_fraction:AUTHENTICATING:LOGGED_OUT",
+      "transition_fraction:AUTHENTICATING:AUTHENTICATING",
+      "transition_fraction:AUTHENTICATING:AUTHENTICATED",
+      "transition_fraction:AUTHENTICATING:VIEWING_ACCOUNT",
+      "transition_fraction:AUTHENTICATING:TRANSFER_PENDING",
+      "transition_fraction:AUTHENTICATING:CLOSED",
+      "transition_fraction:AUTHENTICATING:BLOCKED",
+      "transition_fraction:AUTHENTICATING:REJECTED",
+      "transition_fraction:AUTHENTICATED:LOGGED_OUT",
+      "transition_fraction:AUTHENTICATED:AUTHENTICATING",
+      "transition_fraction:AUTHENTICATED:AUTHENTICATED",
+      "transition_fraction:AUTHENTICATED:VIEWING_ACCOUNT",
+      "transition_fraction:AUTHENTICATED:TRANSFER_PENDING",
+      "transition_fraction:AUTHENTICATED:CLOSED",
+      "transition_fraction:AUTHENTICATED:BLOCKED",
+      "transition_fraction:AUTHENTICATED:REJECTED",
+      "transition_fraction:VIEWING_ACCOUNT:LOGGED_OUT",
+      "transition_fraction:VIEWING_ACCOUNT:AUTHENTICATING",
+      "transition_fraction:VIEWING_ACCOUNT:AUTHENTICATED",
+      "transition_fraction:VIEWING_ACCOUNT:VIEWING_ACCOUNT",
+      "transition_fraction:VIEWING_ACCOUNT:TRANSFER_PENDING",
+      "transition_fraction:VIEWING_ACCOUNT:CLOSED",
+      "transition_fraction:VIEWING_ACCOUNT:BLOCKED",
+      "transition_fraction:VIEWING_ACCOUNT:REJECTED",
+      "transition_fraction:TRANSFER_PENDING:LOGGED_OUT",
+      "transition_fraction:TRANSFER_PENDING:AUTHENTICATING",
+      "transition_fraction:TRANSFER_PENDING:AUTHENTICATED",
+      "transition_fraction:TRANSFER_PENDING:VIEWING_ACCOUNT",
+      "transition_fraction:TRANSFER_PENDING:TRANSFER_PENDING",
+      "transition_fraction:TRANSFER_PENDING:CLOSED",
+      "transition_fraction:TRANSFER_PENDING:BLOCKED",
+      "transition_fraction:TRANSFER_PENDING:REJECTED",
+      "transition_fraction:CLOSED:LOGGED_OUT",
+      "transition_fraction:CLOSED:AUTHENTICATING",
+      "transition_fraction:CLOSED:AUTHENTICATED",
+      "transition_fraction:CLOSED:VIEWING_ACCOUNT",
+      "transition_fraction:CLOSED:TRANSFER_PENDING",
+      "transition_fraction:CLOSED:CLOSED",
+      "transition_fraction:CLOSED:BLOCKED",
+      "transition_fraction:CLOSED:REJECTED",
+      "transition_fraction:BLOCKED:LOGGED_OUT",
+      "transition_fraction:BLOCKED:AUTHENTICATING",
+      "transition_fraction:BLOCKED:AUTHENTICATED",
+      "transition_fraction:BLOCKED:VIEWING_ACCOUNT",
+      "transition_fraction:BLOCKED:TRANSFER_PENDING",
+      "transition_fraction:BLOCKED:CLOSED",
+      "transition_fraction:BLOCKED:BLOCKED",
+      "transition_fraction:BLOCKED:REJECTED",
+      "transition_fraction:REJECTED:LOGGED_OUT",
+      "transition_fraction:REJECTED:AUTHENTICATING",
+      "transition_fraction:REJECTED:AUTHENTICATED",
+      "transition_fraction:REJECTED:VIEWING_ACCOUNT",
+      "transition_fraction:REJECTED:TRANSFER_PENDING",
+      "transition_fraction:REJECTED:CLOSED",
+      "transition_fraction:REJECTED:BLOCKED",
+      "transition_fraction:REJECTED:REJECTED"
+    ],
+    "fsm_version": "bank-session-v1",
+    "version": "bank-features-v1"
+  },
+  "hybrid_scope": "Single-session instantaneous assessment; rolling in-session behavior only; no prior-score retention, cross-session login window, account/IP enforcement, or admin resets.",
+  "hybrid_threshold": 60,
+  "limitations": [
+    "Synthetic evaluation does not establish real-world accuracy.",
+    "Prefix observations from the same session are correlated; complete-session counts are reported separately.",
+    "The live account pipeline includes cross-session evidence and decay; this controlled detector comparison measures single-session snapshots.",
+    "Timing uses the same first 40 complete test sessions for all detectors and varies with hardware."
+  ],
+  "model_sha256": "a9b61b550b68ed9bf0087dc842e141a8fbfd8aeeed14609a8429583d733978b5",
+  "models": {
+    "fsm_only": {
+      "latency": {
+        "median_ms": 0.010756000000000002,
+        "p95_ms": 0.05200629999999999,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.6123271889400922,
+            "confusion_matrix": [
+              [
+                3189,
+                0
+              ],
+              [
+                2019,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 5208
+          },
+          "complete": {
+            "accuracy": 0.5192012288786483,
+            "confusion_matrix": [
+              [
+                676,
+                0
+              ],
+              [
+                626,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 1302
+          },
+          "prefix": {
+            "accuracy": 0.6433691756272402,
+            "confusion_matrix": [
+              [
+                2513,
+                0
+              ],
+              [
+                1393,
+                0
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "samples": 3906
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.7069625095638867,
+            "confusion_matrix": [
+              [
+                3076,
+                0
+              ],
+              [
+                1532,
+                620
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.44733044733044736,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.28810408921933084,
+            "samples": 5228
+          },
+          "complete": {
+            "accuracy": 0.6838514025777104,
+            "confusion_matrix": [
+              [
+                716,
+                0
+              ],
+              [
+                417,
+                186
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.4714828897338403,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.30845771144278605,
+            "samples": 1319
+          },
+          "prefix": {
+            "accuracy": 0.7147608083908928,
+            "confusion_matrix": [
+              [
+                2360,
+                0
+              ],
+              [
+                1115,
+                434
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.437720625315179,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.2801807617817947,
+            "samples": 3909
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.7100435029317194,
+            "confusion_matrix": [
+              [
+                3105,
+                0
+              ],
+              [
+                1533,
+                649
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.45849523136700815,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.29743354720439963,
+            "samples": 5287
+          },
+          "complete": {
+            "accuracy": 0.6982693754702785,
+            "confusion_matrix": [
+              [
+                732,
+                0
+              ],
+              [
+                401,
+                196
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.4943253467843632,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.32830820770519265,
+            "samples": 1329
+          },
+          "prefix": {
+            "accuracy": 0.7139969681657403,
+            "confusion_matrix": [
+              [
+                2373,
+                0
+              ],
+              [
+                1132,
+                453
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.4445534838076546,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.2858044164037855,
+            "samples": 3958
+          }
+        }
+      }
+    },
+    "hybrid": {
+      "latency": {
+        "median_ms": 11.3154105,
+        "p95_ms": 12.4194895,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.7868663594470046,
+            "confusion_matrix": [
+              [
+                3189,
+                0
+              ],
+              [
+                1110,
+                909
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.6209016393442623,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.45022288261515603,
+            "samples": 5208
+          },
+          "complete": {
+            "accuracy": 0.7588325652841782,
+            "confusion_matrix": [
+              [
+                676,
+                0
+              ],
+              [
+                314,
+                312
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.6652452025586354,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.4984025559105431,
+            "samples": 1302
+          },
+          "prefix": {
+            "accuracy": 0.7962109575012801,
+            "confusion_matrix": [
+              [
+                2513,
+                0
+              ],
+              [
+                796,
+                597
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.6,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.42857142857142855,
+            "samples": 3906
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.8875286916602907,
+            "confusion_matrix": [
+              [
+                3076,
+                0
+              ],
+              [
+                588,
+                1564
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.8417653390742734,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.7267657992565055,
+            "samples": 5228
+          },
+          "complete": {
+            "accuracy": 0.9977255496588324,
+            "confusion_matrix": [
+              [
+                716,
+                0
+              ],
+              [
+                3,
+                600
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9975062344139651,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.9950248756218906,
+            "samples": 1319
+          },
+          "prefix": {
+            "accuracy": 0.8503453568687643,
+            "confusion_matrix": [
+              [
+                2360,
+                0
+              ],
+              [
+                585,
+                964
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7672105053720653,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.6223369916074887,
+            "samples": 3909
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.9078872706638925,
+            "confusion_matrix": [
+              [
+                3105,
+                0
+              ],
+              [
+                487,
+                1695
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.8743874129481558,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.7768102658111824,
+            "samples": 5287
+          },
+          "complete": {
+            "accuracy": 0.9887133182844243,
+            "confusion_matrix": [
+              [
+                732,
+                0
+              ],
+              [
+                15,
+                582
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9872773536895675,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.9748743718592965,
+            "samples": 1329
+          },
+          "prefix": {
+            "accuracy": 0.8807478524507327,
+            "confusion_matrix": [
+              [
+                2373,
+                0
+              ],
+              [
+                472,
+                1113
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.8250555967383247,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "recall": 0.7022082018927445,
+            "samples": 3958
+          }
+        }
+      }
+    },
+    "isolation_forest": {
+      "latency": {
+        "median_ms": 5.939234,
+        "p95_ms": 6.802617699999999,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.7955069124423964,
+            "confusion_matrix": [
+              [
+                2471,
+                718
+              ],
+              [
+                347,
+                1672
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7584486278067589,
+            "false_positive_rate": 0.22514894951395423,
+            "precision": 0.699581589958159,
+            "recall": 0.828132738979693,
+            "samples": 5208
+          },
+          "complete": {
+            "accuracy": 0.7403993855606759,
+            "confusion_matrix": [
+              [
+                338,
+                338
+              ],
+              [
+                0,
+                626
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7874213836477988,
+            "false_positive_rate": 0.5,
+            "precision": 0.6493775933609959,
+            "recall": 1.0,
+            "samples": 1302
+          },
+          "prefix": {
+            "accuracy": 0.8138760880696364,
+            "confusion_matrix": [
+              [
+                2133,
+                380
+              ],
+              [
+                347,
+                1046
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7421071301880099,
+            "false_positive_rate": 0.15121368881814565,
+            "precision": 0.7335203366058906,
+            "recall": 0.750897343862168,
+            "samples": 3906
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.8335883703136955,
+            "confusion_matrix": [
+              [
+                2880,
+                196
+              ],
+              [
+                674,
+                1478
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7726084683742812,
+            "false_positive_rate": 0.06371911573472042,
+            "precision": 0.8829151732377539,
+            "recall": 0.6868029739776952,
+            "samples": 5228
+          },
+          "complete": {
+            "accuracy": 0.8392721758908264,
+            "confusion_matrix": [
+              [
+                647,
+                69
+              ],
+              [
+                143,
+                460
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.8127208480565371,
+            "false_positive_rate": 0.09636871508379888,
+            "precision": 0.8695652173913043,
+            "recall": 0.7628524046434494,
+            "samples": 1319
+          },
+          "prefix": {
+            "accuracy": 0.8316705039652085,
+            "confusion_matrix": [
+              [
+                2233,
+                127
+              ],
+              [
+                531,
+                1018
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7557535263548627,
+            "false_positive_rate": 0.053813559322033896,
+            "precision": 0.8890829694323145,
+            "recall": 0.657198192382182,
+            "samples": 3909
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.8539814639682239,
+            "confusion_matrix": [
+              [
+                2973,
+                132
+              ],
+              [
+                640,
+                1542
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.799792531120332,
+            "false_positive_rate": 0.04251207729468599,
+            "precision": 0.921146953405018,
+            "recall": 0.7066911090742438,
+            "samples": 5287
+          },
+          "complete": {
+            "accuracy": 0.7960872836719338,
+            "confusion_matrix": [
+              [
+                613,
+                119
+              ],
+              [
+                152,
+                445
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.7665805340223945,
+            "false_positive_rate": 0.16256830601092895,
+            "precision": 0.7890070921985816,
+            "recall": 0.7453936348408711,
+            "samples": 1329
+          },
+          "prefix": {
+            "accuracy": 0.8734209196563921,
+            "confusion_matrix": [
+              [
+                2360,
+                13
+              ],
+              [
+                488,
+                1097
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.814100185528757,
+            "false_positive_rate": 0.005478297513695744,
+            "precision": 0.9882882882882883,
+            "recall": 0.6921135646687697,
+            "samples": 3958
+          }
+        }
+      }
+    },
+    "random_forest": {
+      "latency": {
+        "median_ms": 4.9502695,
+        "p95_ms": 7.344088249999992,
+        "samples": 40,
+        "scope": "raw complete-session events to decision, including required feature/context extraction; excludes database and network"
+      },
+      "metrics": {
+        "held_out": {
+          "all_observations": {
+            "accuracy": 0.9456605222734255,
+            "confusion_matrix": [
+              [
+                2906,
+                283
+              ],
+              [
+                0,
+                2019
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9345059014117103,
+            "false_positive_rate": 0.08874255252430228,
+            "precision": 0.8770634231103388,
+            "recall": 1.0,
+            "samples": 5208
+          },
+          "complete": {
+            "accuracy": 0.9685099846390169,
+            "confusion_matrix": [
+              [
+                635,
+                41
+              ],
+              [
+                0,
+                626
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9682907965970611,
+            "false_positive_rate": 0.060650887573964495,
+            "precision": 0.9385307346326837,
+            "recall": 1.0,
+            "samples": 1302
+          },
+          "prefix": {
+            "accuracy": 0.9380440348182284,
+            "confusion_matrix": [
+              [
+                2271,
+                242
+              ],
+              [
+                0,
+                1393
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9200792602377807,
+            "false_positive_rate": 0.09629924393155591,
+            "precision": 0.8519877675840979,
+            "recall": 1.0,
+            "samples": 3906
+          }
+        },
+        "test": {
+          "all_observations": {
+            "accuracy": 0.9447207345065034,
+            "confusion_matrix": [
+              [
+                2787,
+                289
+              ],
+              [
+                0,
+                2152
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9370781624210756,
+            "false_positive_rate": 0.09395318595578674,
+            "precision": 0.8816058992216305,
+            "recall": 1.0,
+            "samples": 5228
+          },
+          "complete": {
+            "accuracy": 0.9332827899924185,
+            "confusion_matrix": [
+              [
+                628,
+                88
+              ],
+              [
+                0,
+                603
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9319938176197836,
+            "false_positive_rate": 0.12290502793296089,
+            "precision": 0.8726483357452967,
+            "recall": 1.0,
+            "samples": 1319
+          },
+          "prefix": {
+            "accuracy": 0.9485801995395242,
+            "confusion_matrix": [
+              [
+                2159,
+                201
+              ],
+              [
+                0,
+                1549
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9390724461958169,
+            "false_positive_rate": 0.08516949152542373,
+            "precision": 0.8851428571428571,
+            "recall": 1.0,
+            "samples": 3909
+          }
+        },
+        "validation": {
+          "all_observations": {
+            "accuracy": 0.9926234159258559,
+            "confusion_matrix": [
+              [
+                3066,
+                39
+              ],
+              [
+                0,
+                2182
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9911424029071088,
+            "false_positive_rate": 0.012560386473429951,
+            "precision": 0.9824403421882035,
+            "recall": 1.0,
+            "samples": 5287
+          },
+          "complete": {
+            "accuracy": 0.999247554552295,
+            "confusion_matrix": [
+              [
+                731,
+                1
+              ],
+              [
+                0,
+                597
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.999163179916318,
+            "false_positive_rate": 0.001366120218579235,
+            "precision": 0.9983277591973244,
+            "recall": 1.0,
+            "samples": 1329
+          },
+          "prefix": {
+            "accuracy": 0.9903991915108641,
+            "confusion_matrix": [
+              [
+                2335,
+                38
+              ],
+              [
+                0,
+                1585
+              ]
+            ],
+            "confusion_matrix_axes": "rows=true, columns=predicted; order=[normal,suspicious]",
+            "f1": 0.9881546134663342,
+            "false_positive_rate": 0.016013485040033713,
+            "precision": 0.9765865680837954,
+            "recall": 1.0,
+            "samples": 3958
+          }
+        }
+      }
+    }
+  },
+  "observation_counts": {
+    "held_out": 5208,
+    "test": 5228,
+    "train": 24065,
+    "validation": 5287
+  },
+  "policy": {
+    "behavior_weight": 0.25,
+    "fsm_weight": 0.3,
+    "half_life_seconds": 600,
+    "if_weight": 0.1,
+    "max_events": 200,
+    "rf_weight": 0.35,
+    "version": "hybrid-risk-v1",
+    "window_seconds": 60
+  },
+  "thresholds": {
+    "isolation_forest": 0.5585541386762802,
+    "random_forest": 0.012506734913793106
+  },
+  "tuning": "No fitting or threshold selection. Frozen model thresholds and declared hybrid policy.",
+  "version": "bank-comparison-v1"
+}

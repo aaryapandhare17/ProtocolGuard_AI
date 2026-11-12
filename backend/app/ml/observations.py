@@ -22,7 +22,7 @@ def prefix_label(scenario, source_label, events):
     if source_label == 0:
         return 0
     kinds = [event.event_type for event in events]
-    if scenario == "failed_login_burst":
+    if scenario in {"failed_login_burst", "failed_login_paced", "heldout_jittered_login_failures"}:
         return int(kinds.count("LOGIN_FAILED") >= 3)
     if scenario == "rapid_requests":
         return int(sum(kind in {"VIEW_BALANCE", "VIEW_HISTORY"} for kind in kinds) >= 10)

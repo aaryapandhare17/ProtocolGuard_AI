@@ -9,7 +9,7 @@ and uses no real accounts, IP addresses, payments, or customer data.
 Run from the repository root with the backend environment activated:
 
 ```sh
-python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v1
+python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v2
 ```
 
 The output directory contains:
@@ -35,12 +35,15 @@ Only Python's standard library is needed for this stage.
 | normal_busy | 0 | Longer legitimate sessions with frequent browsing |
 | normal_retry | 0 | One or two failed login attempts followed by normal use |
 | failed_login_burst | 1 | Six to 25 rapid failed-login cycles |
+| failed_login_paced | 1 | Eight to 19 failures with realistic request and handler delays |
 | unauthorized_access | 1 | Repeated requests without authentication |
 | rapid_requests | 1 | Authenticated, high-frequency balance/history requests |
 | transfer_burst | 1 | Many rapidly repeated simulated transfer requests |
 | invalid_sequence | 1 | Actions in an undefined protocol order |
 | heldout_slow_normal | 0 | Unseen normal sessions with long pauses |
 | heldout_paced_transfer | 1 | Unseen suspicious transfer pattern at a slower pace |
+| heldout_jittered_login_failures | 1 | Unseen jittered repeated authentication failures |
+| heldout_delayed_retry | 0 | Unseen delayed legitimate retries followed by success |
 
 Labels represent the intended synthetic scenario, assigned independently of DFA results.
 Failed-login, rapid-request, and transfer-burst sequences can have zero DFA violations while
@@ -48,14 +51,14 @@ being labeled suspicious. Normal retry and busy sessions add benign variation.
 These are assumptions for a college demonstration, not labels derived from real incidents.
 
 Each family has 20 parameter recipes. Sampling changes sequence lengths, activity choices,
-inter-event intervals, and the number of transfer/login attempts. Paired authentication and
-transfer-recording events get short delays because they are produced within one request.
+inter-event intervals, and the number of transfer/login attempts. Paired authentication events have varied server/database latency shared by normal
+and suspicious families. Transfer-recording events retain short internal delays.
 
 ## Partitions and leakage controls
 
 For each ordinary scenario, a seed-specific shuffle assigns its 20 recipes to 14 training,
 three validation, and three test groups. Every repetition of a scenario/recipe stays in its
-assigned partition; an entire session occupies exactly one row and one partition. The two
+assigned partition; an entire session occupies exactly one row and one partition. The four
 held-out families appear exclusively in `held_out`, including both benign and suspicious examples.
 
 Because the scenario sampling is weighted, the final row counts are approximate, not exact
@@ -63,10 +66,10 @@ Because the scenario sampling is weighted, the final row counts are approximate,
 
 | Partition | Sessions |
 | --- | ---: |
-| train | 6,498 |
-| validation | 1,380 |
-| test | 1,346 |
-| held_out | 776 |
+| train | 6,050 |
+| validation | 1,329 |
+| test | 1,319 |
+| held_out | 1,302 |
 
 Future training must use `train` to fit preprocessing/models, `validation` to choose settings,
 `test` for final evaluation within known families, and `held_out` for unseen-family evaluation.

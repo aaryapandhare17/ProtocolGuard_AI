@@ -1,0 +1,760 @@
+{
+  "passed": true,
+  "threshold": 60,
+  "risk_policy_unchanged": true,
+  "scope": "isolated ASGI replay with controlled timestamps; not a live-network timing guarantee",
+  "attack_cases": [
+    {
+      "latency_seconds": 0.005,
+      "gap_seconds": 0.05,
+      "requested_failures": 15,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.005,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 0.06,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 0.115,
+          "response_status": 401,
+          "score": 48.54123163088522,
+          "blocked": false
+        },
+        {
+          "attempt": 4,
+          "seconds": 0.17,
+          "response_status": 401,
+          "score": 53.12654832654435,
+          "blocked": false
+        },
+        {
+          "attempt": 5,
+          "seconds": 0.225,
+          "response_status": 401,
+          "score": 57.47274085527999,
+          "blocked": false
+        },
+        {
+          "attempt": 6,
+          "seconds": 0.28,
+          "response_status": 401,
+          "score": 61.63940752194665,
+          "blocked": true
+        }
+      ],
+      "blocked": true,
+      "block_source": "automatic",
+      "alert_reason": "Risk score 61.64 exceeds configured threshold 60.00",
+      "protected_status": 403,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.5,
+      "gap_seconds": 2.0,
+      "requested_failures": 15,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.5,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 3.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 5.5,
+          "response_status": 401,
+          "score": 38.105222555730435,
+          "blocked": false
+        },
+        {
+          "attempt": 4,
+          "seconds": 8.0,
+          "response_status": 401,
+          "score": 43.30730588906377,
+          "blocked": false
+        },
+        {
+          "attempt": 5,
+          "seconds": 10.5,
+          "response_status": 401,
+          "score": 47.68331233028761,
+          "blocked": false
+        },
+        {
+          "attempt": 6,
+          "seconds": 13.0,
+          "response_status": 401,
+          "score": 53.39807859911397,
+          "blocked": false
+        },
+        {
+          "attempt": 7,
+          "seconds": 15.5,
+          "response_status": 401,
+          "score": 60.33447151376777,
+          "blocked": true
+        }
+      ],
+      "blocked": true,
+      "block_source": "automatic",
+      "alert_reason": "Risk score 60.33 exceeds configured threshold 60.00",
+      "protected_status": 403,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 1.0,
+      "gap_seconds": 3.0,
+      "requested_failures": 15,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 1.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 5.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 9.0,
+          "response_status": 401,
+          "score": 39.140639222397105,
+          "blocked": false
+        },
+        {
+          "attempt": 4,
+          "seconds": 13.0,
+          "response_status": 401,
+          "score": 43.30951177141671,
+          "blocked": false
+        },
+        {
+          "attempt": 5,
+          "seconds": 17.0,
+          "response_status": 401,
+          "score": 47.47617843808338,
+          "blocked": false
+        },
+        {
+          "attempt": 6,
+          "seconds": 21.0,
+          "response_status": 401,
+          "score": 53.59131531408984,
+          "blocked": false
+        },
+        {
+          "attempt": 7,
+          "seconds": 25.0,
+          "response_status": 401,
+          "score": 60.72094494371945,
+          "blocked": true
+        }
+      ],
+      "blocked": true,
+      "block_source": "automatic",
+      "alert_reason": "Risk score 60.72 exceeds configured threshold 60.00",
+      "protected_status": 403,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 1.5,
+      "gap_seconds": 2.5,
+      "requested_failures": 15,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 1.5,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 5.5,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 9.5,
+          "response_status": 401,
+          "score": 39.138124854581015,
+          "blocked": false
+        },
+        {
+          "attempt": 4,
+          "seconds": 13.5,
+          "response_status": 401,
+          "score": 43.30951177141671,
+          "blocked": false
+        },
+        {
+          "attempt": 5,
+          "seconds": 17.5,
+          "response_status": 401,
+          "score": 47.94316716594169,
+          "blocked": false
+        },
+        {
+          "attempt": 6,
+          "seconds": 21.5,
+          "response_status": 401,
+          "score": 56.94075170700449,
+          "blocked": false
+        },
+        {
+          "attempt": 7,
+          "seconds": 25.5,
+          "response_status": 401,
+          "score": 63.42625895338131,
+          "blocked": true
+        }
+      ],
+      "blocked": true,
+      "block_source": "automatic",
+      "alert_reason": "Risk score 63.43 exceeds configured threshold 60.00",
+      "protected_status": 403,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 2.0,
+      "gap_seconds": 2.0,
+      "requested_failures": 15,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 2.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 6.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 10.0,
+          "response_status": 401,
+          "score": 38.93913884411403,
+          "blocked": false
+        },
+        {
+          "attempt": 4,
+          "seconds": 14.0,
+          "response_status": 401,
+          "score": 44.93958171908178,
+          "blocked": false
+        },
+        {
+          "attempt": 5,
+          "seconds": 18.0,
+          "response_status": 401,
+          "score": 50.52331762890466,
+          "blocked": false
+        },
+        {
+          "attempt": 6,
+          "seconds": 22.0,
+          "response_status": 401,
+          "score": 59.58531440829273,
+          "blocked": false
+        },
+        {
+          "attempt": 7,
+          "seconds": 26.0,
+          "response_status": 401,
+          "score": 64.52492793486279,
+          "blocked": true
+        }
+      ],
+      "blocked": true,
+      "block_source": "automatic",
+      "alert_reason": "Risk score 64.52 exceeds configured threshold 60.00",
+      "protected_status": 403,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 3.0,
+      "gap_seconds": 0.5,
+      "requested_failures": 15,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 3.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 6.5,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 10.0,
+          "response_status": 401,
+          "score": 39.140639222397105,
+          "blocked": false
+        },
+        {
+          "attempt": 4,
+          "seconds": 13.5,
+          "response_status": 401,
+          "score": 43.30951177141671,
+          "blocked": false
+        },
+        {
+          "attempt": 5,
+          "seconds": 17.0,
+          "response_status": 401,
+          "score": 47.47617843808338,
+          "blocked": false
+        },
+        {
+          "attempt": 6,
+          "seconds": 20.5,
+          "response_status": 401,
+          "score": 51.642845104750045,
+          "blocked": false
+        },
+        {
+          "attempt": 7,
+          "seconds": 24.0,
+          "response_status": 401,
+          "score": 57.564745265780644,
+          "blocked": false
+        },
+        {
+          "attempt": 8,
+          "seconds": 27.5,
+          "response_status": 401,
+          "score": 61.989060885748444,
+          "blocked": true
+        }
+      ],
+      "blocked": true,
+      "block_source": "automatic",
+      "alert_reason": "Risk score 61.99 exceeds configured threshold 60.00",
+      "protected_status": 403,
+      "unrelated_account_unchanged": true
+    }
+  ],
+  "normal_retry_controls": [
+    {
+      "latency_seconds": 0.005,
+      "gap_seconds": 0.05,
+      "requested_failures": 0,
+      "attempts": [],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.005,
+      "gap_seconds": 0.05,
+      "requested_failures": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.005,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.005,
+      "gap_seconds": 0.05,
+      "requested_failures": 2,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.005,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 0.06,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.005,
+      "gap_seconds": 0.05,
+      "requested_failures": 3,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.005,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 0.06,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 0.115,
+          "response_status": 401,
+          "score": 48.54123163088522,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.5,
+      "gap_seconds": 2,
+      "requested_failures": 0,
+      "attempts": [],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.5,
+      "gap_seconds": 2,
+      "requested_failures": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.5,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.5,
+      "gap_seconds": 2,
+      "requested_failures": 2,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.5,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 3.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 0.5,
+      "gap_seconds": 2,
+      "requested_failures": 3,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 0.5,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 3.0,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 5.5,
+          "response_status": 401,
+          "score": 38.105222555730435,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 2,
+      "gap_seconds": 4,
+      "requested_failures": 0,
+      "attempts": [],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 2,
+      "gap_seconds": 4,
+      "requested_failures": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 2,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 2,
+      "gap_seconds": 4,
+      "requested_failures": 2,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 2,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 8,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    },
+    {
+      "latency_seconds": 2,
+      "gap_seconds": 4,
+      "requested_failures": 3,
+      "attempts": [
+        {
+          "attempt": 1,
+          "seconds": 2,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 2,
+          "seconds": 8,
+          "response_status": 401,
+          "score": 0.0,
+          "blocked": false
+        },
+        {
+          "attempt": 3,
+          "seconds": 14,
+          "response_status": 401,
+          "score": 37.149957173715556,
+          "blocked": false
+        }
+      ],
+      "blocked": false,
+      "block_source": null,
+      "alert_reason": null,
+      "protected_status": 200,
+      "unrelated_account_unchanged": true
+    }
+  ],
+  "outside_window_control": {
+    "latency_seconds": 1,
+    "gap_seconds": 25,
+    "requested_failures": 15,
+    "attempts": [
+      {
+        "attempt": 1,
+        "seconds": 1,
+        "response_status": 401,
+        "score": 0.0,
+        "blocked": false
+      },
+      {
+        "attempt": 2,
+        "seconds": 27,
+        "response_status": 401,
+        "score": 0.0,
+        "blocked": false
+      },
+      {
+        "attempt": 3,
+        "seconds": 53,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 4,
+        "seconds": 79,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 5,
+        "seconds": 105,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 6,
+        "seconds": 131,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 7,
+        "seconds": 157,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 8,
+        "seconds": 183,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 9,
+        "seconds": 209,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 10,
+        "seconds": 235,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 11,
+        "seconds": 261,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 12,
+        "seconds": 287,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 13,
+        "seconds": 313,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 14,
+        "seconds": 339,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      },
+      {
+        "attempt": 15,
+        "seconds": 365,
+        "response_status": 401,
+        "score": 34.652791640943626,
+        "blocked": false
+      }
+    ],
+    "blocked": false,
+    "block_source": null,
+    "alert_reason": null,
+    "protected_status": 200,
+    "unrelated_account_unchanged": true
+  }
+}

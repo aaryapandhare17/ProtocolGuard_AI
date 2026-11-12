@@ -6,8 +6,8 @@ Activate the backend virtual environment, then run from the repository root:
 
 ```sh
 python -m pip install -e "backend[dev,ml]"
-python -m app.ml.train --dataset ml/datasets/bank-v1 --output ml/artifacts/bank-v1 --seed 42
-python -m app.ml.evaluate --dataset ml/datasets/bank-v1 --artifacts ml/artifacts/bank-v1 --output ml/evaluation/bank-v1.json
+python -m app.ml.train --dataset ml/datasets/bank-v2 --output ml/artifacts/bank-v2 --seed 42
+python -m app.ml.evaluate --dataset ml/datasets/bank-v2 --artifacts ml/artifacts/bank-v2 --output ml/evaluation/bank-v2.json
 ```
 
 Generate the dataset first if needed; see [dataset documentation](ml-dataset.md).
@@ -18,7 +18,7 @@ before reproducing the run. Other compatible environments can train their own ar
 
 Training writes `detectors.joblib`, `artifact-manifest.json`, and `evaluation.json`.
 Generated datasets, models, and evaluation outputs remain ignored by Git. The measured
-report from the executed 10,000-session run is preserved in [ml-evaluation.json](ml-evaluation.json).
+report from the current 10,000-session run is preserved in [ml-evaluation-v2.json](ml-evaluation-v2.json).
 Reevaluation loads saved models and uses their frozen thresholds; it never fits or tunes.
 
 ## What the models do
@@ -35,7 +35,8 @@ suspicious training observations are excluded. `-score_samples` makes higher raw
 mean more anomalous. These raw scores are not probabilities, and the built-in contamination
 threshold is not used for our final classification.
 
-Both models use the same 90-feature extractor as runtime inference, in its fixed order.
+Both models accept the shared 90-feature runtime contract. RF uses all inputs; IF
+projects to 12 base activity features through its saved pipeline.
 Tree models do not require scaling, so there is no fitted scaler to leak test information.
 The artifact persists both estimators, the exact feature/DFA schema, package version,
 thresholds, normal-score reference distribution, dataset hashes, and random seed.
@@ -116,7 +117,7 @@ a high score on a small or simple synthetic family should not be generalized to 
 from app.ml.inference import DetectorBundle
 from app.ml.features import from_security_events
 
-detector = DetectorBundle.load("ml/artifacts/bank-v1")
+detector = DetectorBundle.load("ml/artifacts/bank-v2")
 # rows must be ordered security events from the observation being analyzed
 result = detector.predict(from_security_events(rows), complete=False)
 ```
@@ -140,3 +141,5 @@ prediction upload endpoint; artifacts are generated and loaded from trusted loca
 Measured models and operational prediction history are now visible in the admin dashboard.
 The [four-detector comparison](ml-analytics.md) adds FSM-only and frozen hybrid policy
 evaluation on the same observations without retraining or retuning.
+
+See [login timing release v2](login-model-v2.md) for current measured reports and acceptance checks. The earlier `ml-evaluation.json` report is retained as history.

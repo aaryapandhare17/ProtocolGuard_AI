@@ -136,3 +136,20 @@ def test_reproducible_export_integrity_no_group_overlap_and_no_label_features(tm
     with pytest.raises(FileExistsError):
         build_dataset(first, count=600, seed=42)
     assert json.loads((first/'manifest.json').read_text()) == manifest
+
+
+def test_login_latency_profiles_cover_paced_failures_and_benign_retries():
+    for scenario in ("normal_retry", "failed_login_paced"):
+        profiles = []
+        for recipe in range(20):
+            events = make_events(scenario, recipe, random.Random(900 + recipe), 0)
+            profiles.extend(
+                right.timestamp - left.timestamp
+                for left, right in zip(events, events[1:])
+                if right.event_type == "LOGIN_FAILED"
+            )
+        assert min(profiles) < 0.02 and max(profiles) > 1
+    assert {
+        "heldout_jittered_login_failures",
+        "heldout_delayed_retry",
+    } <= HELDOUT_SCENARIOS

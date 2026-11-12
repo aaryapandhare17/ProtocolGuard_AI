@@ -57,7 +57,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sessions", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--output", type=Path, default=Path("ml/datasets/bank-v1"))
+    parser.add_argument("--output", type=Path, default=Path("ml/datasets/bank-v2"))
     args = parser.parse_args()
     try:
         manifest = build_dataset(args.output, args.sessions, args.seed)

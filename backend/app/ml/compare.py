@@ -201,10 +201,10 @@ def compare_detectors(dataset, artifacts, output, policy=None, threshold=60):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v1"))
-    parser.add_argument("--artifacts", type=Path, default=Path("ml/artifacts/bank-v1"))
+    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v2"))
+    parser.add_argument("--artifacts", type=Path, default=Path("ml/artifacts/bank-v2"))
     parser.add_argument(
-        "--output", type=Path, default=Path("ml/evaluation/comparison-v1.json")
+        "--output", type=Path, default=Path("ml/evaluation/comparison-v2.json")
     )
     args = parser.parse_args()
     try:

@@ -18,9 +18,9 @@ class Settings(BaseSettings):
     auto_block_enabled: bool = True
     block_threshold: float = Field(default=60, ge=0, le=100, allow_inf_nan=False)
     simulation_enabled: bool = True
-    ml_comparison_report: str = "ml/evaluation/comparison-v1.json"
+    ml_comparison_report: str = "ml/evaluation/comparison-v2.json"
     ml_enabled: bool = True
-    ml_model_directory: str = "ml/artifacts/bank-v1"
+    ml_model_directory: str = "ml/artifacts/bank-v2"
     risk_fsm_weight: float = Field(default=0.30, ge=0, le=1, allow_inf_nan=False)
     risk_rf_weight: float = Field(default=0.35, ge=0, le=1, allow_inf_nan=False)
     risk_if_weight: float = Field(default=0.10, ge=0, le=1, allow_inf_nan=False)

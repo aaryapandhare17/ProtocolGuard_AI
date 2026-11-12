@@ -80,7 +80,10 @@ def saved_evaluation(app):
             if getattr(detector, "artifact_sha256", None) != artifact["sha256"]:
                 raise ValueError("Saved model manifest differs from loaded model")
             if any(
-                report["trees_per_model"] != bundle[name].n_estimators
+                report["trees_per_model"]
+                != getattr(bundle[name], "named_steps", {})
+                .get("detector", bundle[name])
+                .n_estimators
                 for name in ("random_forest", "isolation_forest")
             ):
                 raise ValueError("Model configuration differs from saved report")

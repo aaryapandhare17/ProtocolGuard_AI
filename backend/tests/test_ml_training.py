@@ -3,7 +3,7 @@ np = pytest.importorskip("numpy")
 pytest.importorskip('sklearn')
 pytest.importorskip('pandas')
 from app.ml.dataset import build_dataset
-from app.ml.features import FEATURE_NAMES, feature_vector
+from app.ml.features import BASE_FEATURES, FEATURE_NAMES, feature_vector
 from app.ml.inference import DetectorBundle
 from app.ml.metrics import classification_metrics, select_threshold
 from app.ml.observations import load_observations, prefix_label
@@ -137,8 +137,9 @@ def test_fit_and_threshold_selection_use_only_intended_partitions(trained, tmp_p
         assert np.array_equal(labels, train.label.to_numpy(dtype=int))
         calls.append('rf')
         return rf_fit(self, features, labels)
-    def fit_isolation(self, features):
-        expected = train[train.label == 0][list(FEATURE_NAMES)].to_numpy(dtype=float)
+    def fit_isolation(self, features, labels=None):
+        assert labels is None
+        expected = train[train.label == 0][list(BASE_FEATURES)].to_numpy(dtype=float)
         assert np.array_equal(features, expected)
         calls.append('isolation')
         return isolation_fit(self, features)
@@ -151,3 +152,12 @@ def test_fit_and_threshold_selection_use_only_intended_partitions(trained, tmp_p
     monkeypatch.setattr(training, 'select_threshold', validation_threshold)
     training.train_models(dataset, tmp_path/'checked', trees=4)
     assert calls == ['rf', 'isolation', 'threshold', 'threshold']
+
+
+def test_isolation_projection_is_saved_and_uses_base_activity_features(trained):
+    _, artifacts, report = trained
+    detector = DetectorBundle.load(artifacts)
+    pipeline = detector.bundle["isolation_forest"]
+    assert pipeline.n_features_in_ == len(FEATURE_NAMES)
+    assert pipeline.named_steps["detector"].n_features_in_ == len(BASE_FEATURES)
+    assert report["isolation_feature_names"] == list(BASE_FEATURES)

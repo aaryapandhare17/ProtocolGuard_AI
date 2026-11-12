@@ -22,9 +22,9 @@ def evaluate_saved(dataset, artifacts):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v1"))
-    parser.add_argument("--artifacts", type=Path, default=Path("ml/artifacts/bank-v1"))
-    parser.add_argument("--output", type=Path, default=Path("ml/evaluation/bank-v1.json"))
+    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v2"))
+    parser.add_argument("--artifacts", type=Path, default=Path("ml/artifacts/bank-v2"))
+    parser.add_argument("--output", type=Path, default=Path("ml/evaluation/bank-v2.json"))
     args = parser.parse_args()
     try:
         if args.output.exists():
