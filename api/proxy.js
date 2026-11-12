@@ -55,7 +55,17 @@ async function proxy(request, response) {
   const incoming = new URL(request.url, "https://frontend.invalid");
   if (!incoming.pathname.startsWith("/api/"))
     return response.status(404).json({ detail: "Not found" });
-  const target = new URL(incoming.pathname + incoming.search, origin);
+  let pathname = incoming.pathname;
+  // Vercel may expose either the original URL or the rewritten function URL.
+  if (pathname === "/api/proxy") {
+    const route =
+      request.query?.__pg_path || incoming.searchParams.get("__pg_path");
+    if (typeof route !== "string" || !/^[a-zA-Z0-9_/-]+$/.test(route))
+      return response.status(404).json({ detail: "Not found" });
+    pathname = `/api/${route}`;
+  }
+  incoming.searchParams.delete("__pg_path");
+  const target = new URL(pathname + incoming.search, origin);
   // Do not forward user-supplied host, proxy identity or arbitrary authorization headers.
   const headers = {};
   for (const name of [
@@ -85,12 +95,10 @@ async function proxy(request, response) {
         "Retry-After",
         upstream.headers.get("retry-after") || "10",
       );
-      return response
-        .status(503)
-        .json({
-          detail:
-            "Backend is starting or temporarily unavailable. Please retry shortly.",
-        });
+      return response.status(503).json({
+        detail:
+          "Backend is starting or temporarily unavailable. Please retry shortly.",
+      });
     }
     response.status(upstream.status);
     for (const name of ["content-type", "allow", "retry-after"]) {

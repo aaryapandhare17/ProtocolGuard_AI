@@ -1,6 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const proxy = require("../../api/[...path].js");
+const proxy = require("../../api/proxy.js");
 function response() {
   return {
     headers: {},
@@ -136,6 +136,61 @@ test("converts a hosting wake-up page into retryable API feedback", async () => 
     assert.equal(out.headers["Retry-After"], "10");
     assert(out.body.detail.includes("starting"));
     assert(!JSON.stringify(out.body).includes("<html>"));
+  } finally {
+    global.fetch = originalFetch;
+    if (originalOrigin === undefined) delete process.env.BACKEND_ORIGIN;
+    else process.env.BACKEND_ORIGIN = originalOrigin;
+  }
+});
+
+test("routes nested Vercel rewrites to the original backend path and preserves query filters", async () => {
+  const originalFetch = global.fetch,
+    originalOrigin = process.env.BACKEND_ORIGIN;
+  process.env.BACKEND_ORIGIN = "https://backend.test";
+  let observed;
+  global.fetch = async (url) => {
+    observed = String(url);
+    return new Response("{}", {
+      headers: { "content-type": "application/json" },
+    });
+  };
+  try {
+    for (const request of [
+      { url: "/api/proxy?__pg_path=admin%2Fauth%2Fme", query: {} },
+      {
+        url: "/api/proxy?limit=10&after_id=2",
+        query: { __pg_path: "admin/events" },
+      },
+      {
+        url: "/api/admin/events?limit=10&__pg_path=admin/events",
+        query: { __pg_path: "admin/events" },
+      },
+    ]) {
+      const out = response();
+      await proxy({ method: "GET", headers: {}, ...request }, out);
+      assert.equal(out.statusCode, 200);
+      assert(!observed.includes("__pg_path"));
+      const target = new URL(observed);
+      assert.equal(target.origin, "https://backend.test");
+      assert.equal(
+        target.pathname,
+        request.url.includes("auth")
+          ? "/api/admin/auth/me"
+          : "/api/admin/events",
+      );
+      if (request.url.includes("limit"))
+        assert.equal(target.searchParams.get("limit"), "10");
+    }
+    const out = response();
+    await proxy(
+      {
+        method: "GET",
+        headers: {},
+        url: "/api/proxy?__pg_path=https%3A%2F%2Fevil.test",
+      },
+      out,
+    );
+    assert.equal(out.statusCode, 404);
   } finally {
     global.fetch = originalFetch;
     if (originalOrigin === undefined) delete process.env.BACKEND_ORIGIN;
