@@ -15,11 +15,15 @@ from app.api.ips import router as ip_router
 from app.api.dashboard import router as dashboard_router
 from app.api.analytics import router as analytics_router
 from app.security.gateway import IPGateway
+from app.security.proxy_ip import signing_secret
 from app.api.simulation import router as simulation_router
 
 
 def create_app(config=None) -> FastAPI:
     config = config or settings
+    proxy_secret = signing_secret(config)
+    if config.require_signed_client_ip and not proxy_secret:
+        raise ValueError("REQUIRE_SIGNED_CLIENT_IP requires CLIENT_IP_SIGNING_SECRET")
     engine, factory = configure(config.database_url)
 
     @asynccontextmanager

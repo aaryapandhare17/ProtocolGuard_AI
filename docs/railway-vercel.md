@@ -110,10 +110,11 @@ Keep production simulation execution disabled. Demonstrate the isolated attack l
 locally. Neither Railway's nor Vercel's proxy addresses should automatically be
 interpreted as visitor IPs. Leave automatic IP restrictions off and avoid manually
 blocking a shared proxy address until the forwarding topology is verified end to
-end. Account-level enforcement remains active. The current proxy intentionally
-omits visitor forwarding headers, so the hosted setup does not claim verified
-per-visitor IP attribution.
+end. Account-level enforcement remains active. Verified per-visitor attribution
+requires configuring the signed visitor-IP bridge on both hosts as described below.
 
 Backups, one-worker operation and SQLite migration guidance are in
 [the deployment operations guide](deployment.md). Its Render launch instructions
 are an alternative; use the Railway/Vercel steps above for this deployment.
+
+For correct visitor attribution, configure the optional [signed visitor-IP bridge](visitor-ip-forwarding.md).

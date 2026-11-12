@@ -1,4 +1,4 @@
-from pydantic import Field, model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     serve_frontends: bool = True
     static_directory: str | None = None
     database_url: str = "sqlite:///./protocolguard.db"
+    require_signed_client_ip: bool = False
+    client_ip_signing_secret: SecretStr = SecretStr("")
     cors_origins: str = "http://localhost:5173,http://localhost:5174"
 
     ip_auto_restrict_enabled: bool = True

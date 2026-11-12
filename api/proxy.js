@@ -1,4 +1,5 @@
 /** Same-origin API bridge: cookies stay on Vercel; the backend URL is server-only. */
+const clientIpHeaders = require("../server/client-ip.cjs");
 const MAX_BODY = 64 * 1024;
 function backendOrigin(value) {
   const url = new URL(value);
@@ -77,6 +78,13 @@ async function proxy(request, response) {
   ]) {
     if (typeof request.headers[name] === "string")
       headers[name] = request.headers[name];
+  }
+  try {
+    Object.assign(headers, clientIpHeaders(request, target));
+  } catch {
+    return response
+      .status(503)
+      .json({ detail: "Visitor IP forwarding is not configured correctly" });
   }
   try {
     const body = await requestBody(request);

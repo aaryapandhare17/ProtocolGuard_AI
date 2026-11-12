@@ -35,11 +35,11 @@ origins explicitly; wildcard origins are not a substitute for configuration.
 The Vercel build uses authenticated polling, while direct/local hosting retains
 WebSockets. Saved evaluation reports and detector artifacts are built together.
 
-Forwarded visitor IPs are intentionally omitted by the Vercel bridge. Observed
-addresses can describe shared proxies. Keep `IP_AUTO_RESTRICT_ENABLED=false` and do
-not manually block a shared proxy until a trusted end-to-end forwarding design is
-verified. Account-level risk, blocking and session revocation stay active.
-Production lab execution remains disabled; demonstrate attacks in the local lab.
+The optional [signed visitor-IP bridge](visitor-ip-forwarding.md) verifies Vercel's
+edge address using a private shared key before Render uses it. Without that setup,
+addresses can describe shared proxies. Keep `IP_AUTO_RESTRICT_ENABLED=false` until
+the signed bridge is enabled and verified from two networks; account-level blocking
+stays active. Production lab execution remains disabled.
 
 ## Browser verification
 

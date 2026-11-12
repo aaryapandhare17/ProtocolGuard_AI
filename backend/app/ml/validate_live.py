@@ -53,6 +53,7 @@ def replay(artifacts, latency, gap, *, failed_logins=15, normal_retry=False):
             ml_model_directory=str(Path(artifacts).resolve()),
             protocolguard_env="development",
             require_postgres=False,
+            require_signed_client_ip=False,
             serve_frontends=False,
             block_threshold=60,
             auto_block_enabled=True,

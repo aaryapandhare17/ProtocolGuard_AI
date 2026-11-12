@@ -214,3 +214,5 @@ The v2 release broadens login latency/pacing coverage while retaining risk-only
 blocking at 60. See [the release and validation notes](docs/login-model-v2.md) for
 the 15-failures-within-60-seconds target, benign retry controls, measured results,
 remaining limitations and Render deployment verification.
+
+For distinct visitor network addresses behind Vercel, enable the [signed IP forwarding setup](docs/visitor-ip-forwarding.md) after deploying both sides.

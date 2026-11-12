@@ -20,6 +20,8 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false
+      - key: CLIENT_IP_SIGNING_SECRET
+        generateValue: true
       - key: SIMULATION_ENABLED
         value: "false"
       - key: IP_AUTO_RESTRICT_ENABLED
