@@ -210,7 +210,12 @@ function Dashboard({ identity, onLogout }) {
           </div>
           <div className="topbar-actions">
             <span
-              className={`connection ${live.status === "Live" ? "online" : ""}`}
+              className={`connection ${["Live", "Polling"].includes(live.status) ? "online" : ""}`}
+              title={
+                live.status === "Polling"
+                  ? "Connected. Events refresh automatically about every three seconds."
+                  : undefined
+              }
             >
               <i />
               {live.status}
@@ -253,7 +258,7 @@ function Dashboard({ identity, onLogout }) {
               </button>
             </div>
           )}
-          {live.status !== "Live" && (
+          {!["Live", "Polling"].includes(live.status) && (
             <div className="connection-note">
               {live.status === "Connecting"
                 ? "Connecting to live monitoring…"

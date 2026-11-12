@@ -14,9 +14,13 @@ export default function Monitoring({ live }) {
       <PageTitle
         eyebrow="OPERATIONS / LIVE MONITORING"
         title="Every event. In context."
-        text="Committed security activity, streamed directly from the backend."
+        text="Committed security activity, updated automatically from the backend."
       >
-        <Badge value={live.status === "Live" ? "low" : "monitoring"}>
+        <Badge
+          value={
+            ["Live", "Polling"].includes(live.status) ? "low" : "monitoring"
+          }
+        >
           {live.status}
         </Badge>
       </PageTitle>
