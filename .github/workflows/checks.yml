@@ -46,7 +46,7 @@ jobs:
     needs: [backend, frontends]
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t protocolguard-ci .
+      - run: docker build -f deploy/all-in-one.Dockerfile -t protocolguard-ci .
       - name: Verify production image serves both apps and API
         run: |
           docker run -d --name protocolguard-ci -p 127.0.0.1:10000:10000 -e CORS_ORIGINS=https://example.com -e IP_AUTO_RESTRICT_ENABLED=false protocolguard-ci

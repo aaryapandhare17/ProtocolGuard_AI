@@ -47,9 +47,9 @@ The existing local/direct-host WebSocket mode remains available.
 
 1. Sign in at [Railway](https://railway.com) and create a project using
    **Deploy from GitHub repo**. Authorize access to this repository and select it.
-2. Keep the service root at the repository root. `railway.json` selects
-   `deploy/railway.Dockerfile`; verify that path in the build settings if the UI
-   proposes the root Render Dockerfile instead. The image trains its own trusted
+2. Keep the service root at the repository root. Set the Railway configuration
+   file path to `deploy/railway.json`, which selects `deploy/railway.Dockerfile`.
+   These optional Railway files are outside the root to avoid Vercel service inference. The image trains its own trusted
    models and matching comparison report during the build. No model upload is needed.
 3. Attach one persistent volume mounted at `/var/data`. Keep one replica.
    SQLite state must not be written to ephemeral container storage.

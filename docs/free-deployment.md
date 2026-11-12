@@ -33,7 +33,11 @@ limits, not a guaranteed continuously running service.
 2. Import `aaryapandhare17/ProtocolGuard_AI` as a new project.
 3. Use the **repository root**, Framework Preset **Other**, and Node.js **22.x**.
    `vercel.json` supplies the build command, output directory and routes.
-4. Deploy, then copy the stable production origin, for example
+4. If Vercel lists individual applications, choose **Import single project** beside
+   `admin`, then change **Root Directory** to `./` and **Framework Preset** to
+   **Other** on the configuration screen. Do not use multi-service import.
+   Confirm build command `npm run build:vercel` and output directory `dist`.
+5. Deploy, then copy the stable production origin, for example
    `https://protocolguard-ai.vercel.app`.
 
 SecureBank appears at `/` and Admin at `/admin/`. Login cannot complete until the
@@ -82,7 +86,7 @@ local SQLite file automatically.
 For manual service creation, choose a Docker web service, repository root,
 Dockerfile `deploy/postgres.Dockerfile`, instance type **Free**, no disk, and health
 path `/api/health`. Copy the non-secret settings from `render.yaml` as well as the
-four private values above. Do not use the root all-in-one SQLite Dockerfile.
+four private values above. Do not select the optional `deploy/all-in-one.Dockerfile` for this free setup.
 
 ## Step 4: Connect and verify
 

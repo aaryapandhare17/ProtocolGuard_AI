@@ -61,11 +61,12 @@ accounts or another person's deployment. `npm run test:proxy` checks the API bri
 
 ## Optional all-in-one hosting
 
-The root `Dockerfile` still builds both frontends into the FastAPI service, with
+`deploy/all-in-one.Dockerfile` builds both frontends into the FastAPI service, with
 Admin at `/admin/` and native WebSockets. It uses SQLite on `/var/data` by default,
 which requires durable storage and may incur hosting charges. Choose that path only
-with an explicitly provisioned persistent volume and one instance/worker. It is not
-the default no-card Blueprint. For local SQLite backups use its online backup API;
+with an explicitly provisioned persistent volume and one instance/worker. Build it from the repository root with
+`docker build -f deploy/all-in-one.Dockerfile -t protocolguard-all-in-one .`.
+It is not the default no-card Blueprint. For local SQLite backups use its online backup API;
 do not copy only a WAL database file during active writes.
 
 ## Troubleshooting
