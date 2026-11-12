@@ -16,3 +16,5 @@ ml/datasets/*
 ml/evaluation/*
 !ml/evaluation/.gitkeep
 .vercel/
+.neon
+.codex/

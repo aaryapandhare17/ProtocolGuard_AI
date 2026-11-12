@@ -17,3 +17,5 @@ ml/artifacts
 ml/datasets
 ml/evaluation
 .vercel
+.neon
+.codex
