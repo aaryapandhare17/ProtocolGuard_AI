@@ -3,6 +3,11 @@
 Intelligent Banking Intrusion Detection Using Finite-State Machines and Machine Learning.
 A Theory of Computation project using simulated banking data only.
 
+## Live deployment
+
+- [SecureBank sign-in](https://protocolguardai.vercel.app/login)
+- [ProtocolGuard Admin dashboard](https://protocolguardai.vercel.app/admin/)
+
 ## Current implementation
 
 Two React/Vite apps, Tailwind styling, FastAPI, environment configuration, and tests.

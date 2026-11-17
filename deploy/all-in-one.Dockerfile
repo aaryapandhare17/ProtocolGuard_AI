@@ -8,6 +8,7 @@ RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
     npm ci
 COPY apps ./apps
+COPY server ./server
 RUN ADMIN_BASE_PATH=/admin/ npm run build
 
 FROM python:3.12-slim AS runtime

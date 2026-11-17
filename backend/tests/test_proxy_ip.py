@@ -178,6 +178,7 @@ def test_required_forwarding_blocks_unsigned_api_and_direct_websocket_bypass(tmp
         create_app(
             Settings(
                 database_url=f"sqlite:///{tmp_path}/missing.db",
+                client_ip_signing_secret="",
                 require_signed_client_ip=True,
             )
         )

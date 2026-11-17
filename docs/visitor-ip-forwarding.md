@@ -81,3 +81,14 @@ changed method/path/address, stale timestamps, duplicate headers and IPv4-mapped
 Node tests cover Vercel-only edge extraction and matching signatures. Existing login,
 CSRF, account enforcement and ML acceptance checks remain in place. Actual public
 network attribution still needs the private key configured on both hosting accounts.
+
+## Local Vite development
+
+For visits to a Vite server on your LAN, generate a separate development-only
+signing secret of at least 32 bytes and set `CLIENT_IP_SIGNING_SECRET` in the
+repository root's ignored `.env`. Restart FastAPI and both Vite apps. The Vite
+proxy signs the visitor's socket address when forwarding to a loopback API.
+Keep FastAPI on loopback. To allow a LAN browser, start the bank frontend with
+`npm run dev:bank -- --host 0.0.0.0` and add its exact LAN origin to
+`CORS_ORIGINS`. Open that LAN origin from the other device. Local and hosted
+dashboards use their respective databases.

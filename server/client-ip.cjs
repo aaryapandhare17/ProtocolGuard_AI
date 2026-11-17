@@ -1,7 +1,7 @@
 const { createHmac } = require("node:crypto");
 const { isIP } = require("node:net");
 
-module.exports = function clientIpHeaders(
+function clientIpHeaders(
   request,
   target,
   environment = process.env,
@@ -16,13 +16,16 @@ module.exports = function clientIpHeaders(
   const edge = request.headers["x-vercel-forwarded-for"];
   if (typeof edge !== "string" || !isIP(edge.trim()))
     throw new Error("Verified visitor address is unavailable");
-  const address = edge.trim();
+  return signClientIp(edge.trim(), request.method, target.pathname, secret, now);
+}
+
+function signClientIp(address, method, path, secret, now = Date.now()) {
   const timestamp = String(Math.floor(now / 1000));
   const message = [
     "pg-ip-v1",
     timestamp,
-    request.method.toUpperCase(),
-    target.pathname,
+    method.toUpperCase(),
+    path,
     address,
   ].join("\n");
   return {
@@ -32,4 +35,7 @@ module.exports = function clientIpHeaders(
       .update(message)
       .digest("hex"),
   };
-};
+}
+
+module.exports = clientIpHeaders;
+module.exports.signClientIp = signClientIp;
