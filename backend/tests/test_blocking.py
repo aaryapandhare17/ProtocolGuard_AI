@@ -28,7 +28,7 @@ class Suspicious:
 def trigger(client,app):
     app.state.detector,app.state.ml_status=Suspicious(),'ready'
     signin(client)
-    # Ten transfer requests make behavioral evidence > 15 points: total > 60.
+    # Repeated transfers add behavioral evidence to the mock model scores.
     csrf=client.post('/api/auth/login',json={'username':'demo01','password':'bank-test-password'}).json()['csrf_token']
     for _ in range(15):
         response=client.post('/api/bank/transfer-request',headers={'X-CSRF-Token':csrf},json={'recipient':'Demo recipient','amount_cents':100})
@@ -48,6 +48,13 @@ def test_automatic_block_revokes_all_sessions_and_denies_triggering_request(app)
         assert second.get('/api/bank/history').status_code==403
         assert first.get('/api/auth/me').status_code==403
         assert other.get('/api/bank/balance').status_code==200
+        admin_login(other)
+        alert = other.get('/api/admin/alerts').json()[0]
+        target = alert['replay']
+        assert target['event_id'] == alert['evidence']['event_id']
+        replay = other.get(f"/api/admin/fsm/sessions/{target['session_id']}").json()
+        index = next(i for i, row in enumerate(replay['persisted_events']) if row['id'] == target['event_id'])
+        assert replay['transitions'][index]['event'] == 'TRANSFER_REQUEST'
         with app.state.session_factory() as db:
             assert db.get(User,1).blocked
             assert not db.get(User,2).blocked

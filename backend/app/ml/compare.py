@@ -133,6 +133,7 @@ def compare_detectors(dataset, artifacts, output, policy=None, threshold=60):
         name: {"metrics": {}}
         for name in ("fsm_only", "random_forest", "isolation_forest", "hybrid")
     }
+    hybrid_complete_scenarios = {}
     for split in ("validation", "test", "held_out"):
         frame = observations[observations.split == split]
         x = frame[list(FEATURE_NAMES)].to_numpy(dtype=float)
@@ -160,6 +161,14 @@ def compare_detectors(dataset, artifacts, output, policy=None, threshold=60):
             "isolation_forest": raw >= detector.bundle["isolation_forest_threshold"],
             "hybrid": scores > threshold,
         }
+        if split != "validation":
+            complete = frame.assign(flagged=decisions["hybrid"])
+            hybrid_complete_scenarios[split] = {
+                scenario: classification_metrics(
+                    group.label.to_numpy(dtype=int), group.flagged.to_numpy()
+                )
+                for scenario, group in complete[complete.observation == "complete"].groupby("scenario")
+            }
         for name, predictions in decisions.items():
             results[name]["metrics"][split] = summarize(frame, predictions)
     timing = benchmark(detector, policy, benchmark_events, threshold)
@@ -183,6 +192,7 @@ def compare_detectors(dataset, artifacts, output, policy=None, threshold=60):
             "isolation_forest": detector.bundle["isolation_forest_threshold"],
         },
         "models": results,
+        "hybrid_complete_scenarios": hybrid_complete_scenarios,
         "tuning": "No fitting or threshold selection. Frozen model thresholds and declared hybrid policy.",
         "hybrid_scope": "Single-session instantaneous assessment; rolling in-session behavior only; no prior-score retention, cross-session login window, account/IP enforcement, or admin resets.",
         "limitations": [
@@ -201,10 +211,10 @@ def compare_detectors(dataset, artifacts, output, policy=None, threshold=60):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v2"))
-    parser.add_argument("--artifacts", type=Path, default=Path("ml/artifacts/bank-v2"))
+    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v3"))
+    parser.add_argument("--artifacts", type=Path, default=Path("ml/artifacts/bank-v3"))
     parser.add_argument(
-        "--output", type=Path, default=Path("ml/evaluation/comparison-v2.json")
+        "--output", type=Path, default=Path("ml/evaluation/comparison-v3.json")
     )
     args = parser.parse_args()
     try:

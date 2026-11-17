@@ -22,6 +22,7 @@ Random Forest and Isolation Forest training, saved-model inference, and measured
 are implemented. Hybrid risk scoring now runs on banking events with persistent evidence
 and time-based decay. Automatic account blocking, session revocation, persisted alerts,
 admin recovery APIs, and an authenticated live alert stream are implemented.
+Alerts with a recorded FSM trigger open replay at that event and highlight its transition.
 Suspicious-IP tracking, independent IP controls, temporary restrictions, and local
 recovery are implemented. The dark admin dashboard now provides verified login, overview charts, live monitoring,
 account/IP management, alerts, risk histories, security settings, and audit logs.
@@ -119,7 +120,7 @@ The FSM analyzes protocol order; verified sessions and backend authorization sti
 With the backend environment activated, from the repository root:
 
 ```sh
-python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v2
+python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v3
 ```
 
 This creates ignored JSONL sessions, feature CSV, and a versioned manifest. Existing
@@ -131,14 +132,14 @@ See the model training commands below for actual evaluation.
 
 ```sh
 python -m pip install -e "backend[dev,ml]"
-python -m app.ml.train --dataset ml/datasets/bank-v2 --output ml/artifacts/bank-v2
-python -m app.ml.evaluate --dataset ml/datasets/bank-v2 --artifacts ml/artifacts/bank-v2 --output ml/evaluation/bank-v2.json
+python -m app.ml.train --dataset ml/datasets/bank-v3 --output ml/artifacts/bank-v3
+python -m app.ml.evaluate --dataset ml/datasets/bank-v3 --artifacts ml/artifacts/bank-v3 --output ml/evaluation/bank-v3.json
 ```
 
 Use new output paths when repeating runs. [Model documentation](docs/ml-models.md)
 explains prefix observations, threshold selection, inference, and measured limitations.
-The [recorded evaluation](docs/ml-evaluation.json) includes test and held-out results;
-these are synthetic-data measurements, not production accuracy claims.
+The generated evaluation includes test and held-out results. The
+[original evaluation](docs/ml-evaluation.json) is retained as historical evidence.
 ML-specific tests require the `ml` extra; without it those tests are skipped.
 
 ## Hybrid risk scoring
@@ -182,13 +183,13 @@ partial-history behavior, user-detail links, and read-only guarantees.
 ## ML analytics and detector comparison
 
 ```sh
-python -m app.ml.compare --dataset ml/datasets/bank-v2 --artifacts ml/artifacts/bank-v2 --output ml/evaluation/comparison-v2.json
+python -m app.ml.compare --dataset ml/datasets/bank-v3 --artifacts ml/artifacts/bank-v3 --output ml/evaluation/comparison-v3.json
 ```
 
 The admin sidebar now opens measured model metrics, confusion matrices, feature importance,
 recent operational predictions, and a same-cohort comparison of FSM/RF/IF/hybrid detectors.
 See [analytics setup and interpretation](docs/ml-analytics.md) and the
-[executed comparison report](docs/detector-comparison.json). Missing reports show an explicit
+[original comparison report](docs/detector-comparison.json). Missing reports show an explicit
 unavailable state. Evaluation commands do not retrain models or modify banking records.
 
 ## Controlled simulation lab
@@ -213,11 +214,36 @@ usage/storage limits apply. See [PostgreSQL support](docs/postgresql.md) and
 
 The [Railway setup](docs/railway-vercel.md) remains an optional usage-based alternative.
 
-## Login timing model update
+## Paced-transfer detection and alert replay
 
-The v2 release broadens login latency/pacing coverage while retaining risk-only
-blocking at 60. See [the release and validation notes](docs/login-model-v2.md) for
-the 15-failures-within-60-seconds target, benign retry controls, measured results,
-remaining limitations and Render deployment verification.
+The v3 dataset adds varied paced transfers to the training recipes and keeps a separate
+paced-transfer scenario held out. The transfer behavior signal grows after three
+requests within the rolling 60-second window. The default account block still requires
+the combined risk score to exceed 60.
 
-For distinct visitor network addresses behind Vercel, enable the [signed IP forwarding setup](docs/visitor-ip-forwarding.md) after deploying both sides.
+In the 10,000-session synthetic run (seed 42), the hybrid detector flagged **256 of 295**
+held-out paced-transfer sessions and **0 of 1,258** benign complete sessions across
+the test and held-out partitions. The comparison report includes per-scenario results
+for complete sessions. These measurements describe synthetic observations.
+
+The backend acceptance check uses real bank handlers and a controlled clock. It blocked
+all three paced-transfer cases on the fifth or sixth request, created alerts, and denied
+subsequent protected access. All three normal three-transfer controls kept access, and
+the existing failed-login acceptance cases continued to pass.
+
+```sh
+python -m app.ml.validate_live --artifacts ml/artifacts/bank-v3 --output ml/evaluation/acceptance-v3.json
+```
+
+Existing local installations with explicit v2 paths in `.env` should set
+`ML_MODEL_DIRECTORY=ml/artifacts/bank-v3` and
+`ML_COMPARISON_REPORT=ml/evaluation/comparison-v3.json` after generating the v3
+artifacts and comparison report. Restart the backend to load the new models.
+
+In **Security alerts**, choose **Replay triggering event** when the alert links to a
+recorded FSM event. The visualizer opens paused at that event and marks its transition
+in the history. Manual alerts and legacy alerts without replayable evidence keep
+their existing review actions.
+
+See the [historical v2 login timing results](docs/login-model-v2.md) and
+the [signed IP forwarding setup](docs/visitor-ip-forwarding.md).

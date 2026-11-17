@@ -6,6 +6,7 @@ from app.api.routes import admin_identity, database
 from app.database.store import now
 from app.models.entities import AdminAuditLog, BlockedEntity, SecurityAlert, SecuritySettings, User
 from app.services.blocking import audit, block_account, serialize_alert, settings, unblock_account
+from app.services.replay import attach_alert_replays
 
 router = APIRouter(prefix="/api/admin")
 
@@ -70,7 +71,8 @@ def alerts(limit:int=Query(50,ge=1,le=200), unresolved:bool=False, auth=Depends(
     query=select(SecurityAlert)
     if unresolved:
         query=query.where(SecurityAlert.resolved_at.is_(None))
-    return [serialize_alert(row) for row in db.scalars(query.order_by(SecurityAlert.id.desc()).limit(limit))]
+    rows = db.scalars(query.order_by(SecurityAlert.id.desc()).limit(limit))
+    return attach_alert_replays(db, [serialize_alert(row) for row in rows])
 
 
 @router.post("/alerts/{alert_id}/resolve")

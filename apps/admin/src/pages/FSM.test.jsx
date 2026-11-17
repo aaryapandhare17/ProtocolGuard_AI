@@ -7,8 +7,9 @@ import {
   render,
   screen,
 } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import FSM from "./FSM";
+import Alerts from "./Alerts";
 import { api } from "../services/admin";
 vi.mock("../services/admin", () => ({
   api: vi.fn(),
@@ -20,11 +21,27 @@ const definition = {
   initial_state: "LOGGED_OUT",
   accepting_states: ["CLOSED"],
   alphabet: ["LOGIN_ATTEMPT", "LOGIN_SUCCESS", "LOGOUT"],
-  transitions: [],
+  transitions: [
+    { from: "LOGGED_OUT", to: "AUTHENTICATING", event: "LOGIN_ATTEMPT", explicit: true },
+  ],
 };
 vi.mock("../hooks/useResource", () => ({
   useResource: (path) => ({
-    data: path === "/admin/fsm" ? definition : [],
+    data:
+      path === "/admin/fsm"
+        ? definition
+        : path === "/admin/alerts?limit=200"
+          ? [{
+              id: 1, user_id: 1, reason: "Automatic restriction",
+              replay: { session_id: "recorded", event_id: 101 },
+              evidence: { event_id: 101 },
+              created_at: "2026-11-10T10:00:00Z",
+            }, {
+              id: 2, user_id: 2, reason: "Manual restriction",
+              evidence: {},
+              created_at: "2026-11-10T10:01:00Z",
+            }]
+          : [],
     error: "",
     refresh: vi.fn(),
   }),
@@ -101,4 +118,51 @@ it("steps and pauses without sending a mutation, and labels partial evidence", a
   expect(api).toHaveBeenCalledTimes(1);
   expect(api.mock.calls[0][0]).toBe("/admin/fsm/sessions/recorded");
   expect(api.mock.calls[0][1].method).toBeUndefined();
+});
+
+it("links alert evidence to the exact transition without playing the session", async () => {
+  api.mockResolvedValue({
+    initial_state: "LOGGED_OUT",
+    final_state: "AUTHENTICATED",
+    complete_trace: true,
+    classification: "valid prefix",
+    user_id: 1,
+    transitions: [
+      {
+        state_before: "LOGGED_OUT",
+        state_after: "AUTHENTICATING",
+        event: "LOGIN_ATTEMPT",
+        valid: true,
+      },
+      {
+        state_before: "AUTHENTICATING",
+        state_after: "AUTHENTICATED",
+        event: "LOGIN_SUCCESS",
+        valid: true,
+      },
+    ],
+    persisted_events: [
+      { id: 78, timestamp: "2026-11-10T10:00:00Z" },
+      { id: 101, timestamp: "2026-11-10T10:00:01Z" },
+    ],
+  });
+  const live = { revision: 0 };
+  render(
+    <MemoryRouter initialEntries={["/alerts"]}>
+      <Routes>
+        <Route path="/alerts" element={<Alerts live={live} onAction={vi.fn()} />} />
+        <Route path="/fsm" element={<FSM live={live} />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+  fireEvent.click(screen.getByRole("link", { name: "Replay triggering event" }));
+  await screen.findByText("Alert trigger");
+  expect(screen.getByTestId("graph").textContent).toBe("AUTHENTICATED");
+  expect(
+    screen.getByRole("button", { name: "Replay through transition 2" }).getAttribute("aria-current"),
+  ).toBe("step");
+  expect(screen.getByRole("button", { name: "Play replay" })).toBeTruthy();
+  expect(api).toHaveBeenCalledWith("/admin/fsm/sessions/recorded", {
+    signal: expect.any(AbortSignal),
+  });
 });

@@ -65,6 +65,17 @@ export default function Alerts({ live, onAction }) {
                       <p>{row.reason}</p>
                       <Evidence value={row.evidence} />
                       <div className="alert-actions">
+                        {row.replay && (
+                          <Link
+                            className="button small secondary"
+                            to={`/fsm?${new URLSearchParams({
+                              session: row.replay.session_id,
+                              event: row.replay.event_id,
+                            })}`}
+                          >
+                            Replay triggering event
+                          </Link>
+                        )}
                         {row.kind === "account" ? (
                           <>
                             <Link

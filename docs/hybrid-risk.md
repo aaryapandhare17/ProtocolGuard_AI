@@ -60,10 +60,14 @@ is the behavioral component; the factors are not added together:
 | Indicator | Factor |
 | --- | --- |
 | Failed logins | `clip((count−2)/6, 0, 1)` |
-| Transfer requests | `clip((count−3)/12, 0, 1)` |
+| Transfer requests | `clip((count−3)/2, 0, 1)` |
 | Unauthorized requests | `clip(count/3, 0, 1)` |
 | Request burst | `clip((rate−5)/20, 0, 1)` only when at least ten requests were observed |
 | Rate-limit event | 1 if present, otherwise 0 |
+
+The transfer factor contributes after three transfer requests and reaches its
+maximum at five in the observation window. Blocking still requires the combined
+risk score to cross the configured threshold.
 
 Logical request counts exclude paired LOGIN_SUCCESS/LOGIN_FAILED/TRANSFER_RECORDED events.
 Rate divides that count by the observed span with a one-second denominator floor. This

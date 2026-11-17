@@ -9,7 +9,7 @@ and uses no real accounts, IP addresses, payments, or customer data.
 Run from the repository root with the backend environment activated:
 
 ```sh
-python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v2
+python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v3
 ```
 
 The output directory contains:

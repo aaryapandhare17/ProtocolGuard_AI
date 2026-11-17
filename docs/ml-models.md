@@ -6,8 +6,8 @@ Activate the backend virtual environment, then run from the repository root:
 
 ```sh
 python -m pip install -e "backend[dev,ml]"
-python -m app.ml.train --dataset ml/datasets/bank-v2 --output ml/artifacts/bank-v2 --seed 42
-python -m app.ml.evaluate --dataset ml/datasets/bank-v2 --artifacts ml/artifacts/bank-v2 --output ml/evaluation/bank-v2.json
+python -m app.ml.train --dataset ml/datasets/bank-v3 --output ml/artifacts/bank-v3 --seed 42
+python -m app.ml.evaluate --dataset ml/datasets/bank-v3 --artifacts ml/artifacts/bank-v3 --output ml/evaluation/bank-v3.json
 ```
 
 Generate the dataset first if needed; see [dataset documentation](ml-dataset.md).
@@ -18,7 +18,7 @@ before reproducing the run. Other compatible environments can train their own ar
 
 Training writes `detectors.joblib`, `artifact-manifest.json`, and `evaluation.json`.
 Generated datasets, models, and evaluation outputs remain ignored by Git. The measured
-report from the current 10,000-session run is preserved in [ml-evaluation-v2.json](ml-evaluation-v2.json).
+report from the v2 10,000-session run is preserved in [ml-evaluation-v2.json](ml-evaluation-v2.json).
 Reevaluation loads saved models and uses their frozen thresholds; it never fits or tunes.
 
 ## What the models do
@@ -117,7 +117,7 @@ a high score on a small or simple synthetic family should not be generalized to 
 from app.ml.inference import DetectorBundle
 from app.ml.features import from_security_events
 
-detector = DetectorBundle.load("ml/artifacts/bank-v2")
+detector = DetectorBundle.load("ml/artifacts/bank-v3")
 # rows must be ordered security events from the observation being analyzed
 result = detector.predict(from_security_events(rows), complete=False)
 ```
@@ -142,4 +142,4 @@ Measured models and operational prediction history are now visible in the admin 
 The [four-detector comparison](ml-analytics.md) adds FSM-only and frozen hybrid policy
 evaluation on the same observations without retraining or retuning.
 
-See [login timing release v2](login-model-v2.md) for current measured reports and acceptance checks. The earlier `ml-evaluation.json` report is retained as history.
+See [login timing release v2](login-model-v2.md) for historical measured reports and acceptance checks. The earlier `ml-evaluation.json` report is retained as history.

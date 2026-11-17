@@ -182,8 +182,8 @@ def train_models(dataset, output, seed=42, trees=160):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v2"))
-    parser.add_argument("--output", type=Path, default=Path("ml/artifacts/bank-v2"))
+    parser.add_argument("--dataset", type=Path, default=Path("ml/datasets/bank-v3"))
+    parser.add_argument("--output", type=Path, default=Path("ml/artifacts/bank-v3"))
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     try:

@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 import random
 from app.ml.features import ActivityEvent
 
-GENERATOR_VERSION = "bank-synthetic-v2"
+GENERATOR_VERSION = "bank-synthetic-v3"
 RECIPE_COUNT = 20
 SCENARIOS = {
     "normal_browsing": (0, 24),
@@ -16,6 +16,7 @@ SCENARIOS = {
     "unauthorized_access": (1, 8),
     "rapid_requests": (1, 8),
     "transfer_burst": (1, 8),
+    "transfer_paced": (1, 12),
     "invalid_sequence": (1, 6),
     "heldout_slow_normal": (0, 4),
     "heldout_paced_transfer": (1, 4),
@@ -114,6 +115,7 @@ def make_events(
         elif scenario in {
             "normal_transfer",
             "transfer_burst",
+            "transfer_paced",
             "heldout_paced_transfer",
         }:
             transfers = (
@@ -121,10 +123,14 @@ def make_events(
                 if scenario == "normal_transfer"
                 else 15 + recipe
                 if scenario == "transfer_burst"
+                else 5 + recipe % 8
+                if scenario == "transfer_paced"
                 else 5 + recipe % 6
             )
             for _ in range(transfers):
-                types += ["VIEW_BALANCE", "TRANSFER_REQUEST", "TRANSFER_RECORDED"]
+                if scenario != "transfer_paced" or rng.random() < .5:
+                    types.append("VIEW_BALANCE")
+                types += ["TRANSFER_REQUEST", "TRANSFER_RECORDED"]
         else:
             length = (
                 25 + recipe
@@ -156,6 +162,8 @@ def make_events(
         if scenario == "normal_busy"
         else (12.0, 80.0)
         if scenario == "heldout_slow_normal"
+        else (0.8, 5.5)
+        if scenario == "transfer_paced"
         else (1.0, 7.0)
         if scenario == "heldout_paced_transfer"
         else (1.0, 18.0)

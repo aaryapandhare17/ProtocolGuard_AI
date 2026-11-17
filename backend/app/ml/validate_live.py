@@ -4,6 +4,7 @@ All HTTP traffic stays in a disposable local ASGI app. No live account is access
 """
 
 import argparse
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
@@ -27,10 +28,8 @@ TIMING_CASES = (
 )
 
 
-def replay(artifacts, latency, gap, *, failed_logins=15, normal_retry=False):
-    from app.main import create_app
-    from app.api import routes
-
+@contextmanager
+def controlled_clock():
     clock = {"seconds": -10.0, "request_start": -10.0}
     epoch = datetime(2030, 1, 1, tzinfo=timezone.utc)
 
@@ -40,6 +39,42 @@ def replay(artifacts, latency, gap, *, failed_logins=15, normal_retry=False):
             value = epoch + timedelta(seconds=clock["seconds"])
             return value.replace(tzinfo=None) if tz is None else value.astimezone(tz)
 
+    with patch("app.database.store.datetime", ReplayDateTime):
+        yield clock
+
+
+def acceptance_app(artifacts, temporary):
+    from app.main import create_app
+
+    return create_app(Settings(
+        database_url=f"sqlite:///{temporary}/bank.db",
+        ml_model_directory=str(Path(artifacts).resolve()),
+        protocolguard_env="development",
+        require_postgres=False,
+        require_signed_client_ip=False,
+        serve_frontends=False,
+        block_threshold=60,
+        auto_block_enabled=True,
+        ip_auto_restrict_enabled=False,
+        ml_enabled=True,
+        risk_fsm_weight=0.30,
+        risk_rf_weight=0.35,
+        risk_if_weight=0.10,
+        risk_behavior_weight=0.25,
+        risk_window_seconds=60,
+        risk_half_life_seconds=600,
+    ))
+
+
+def seed_acceptance_bank(app):
+    if app.state.ml_status != "ready":
+        raise ValueError("Acceptance checks require ready saved models")
+    seed(app.state.session_factory, "acceptance-bank-password", "acceptance-admin-password")
+
+
+def replay(artifacts, latency, gap, *, failed_logins=15, normal_retry=False):
+    from app.api import routes
+
     original_record = routes.record
 
     def timed_record(db, request, kind, *args, **kwargs):
@@ -48,37 +83,10 @@ def replay(artifacts, latency, gap, *, failed_logins=15, normal_retry=False):
         return original_record(db, request, kind, *args, **kwargs)
 
     with TemporaryDirectory(prefix="protocolguard-ml-acceptance-") as temporary:
-        config = Settings(
-            database_url=f"sqlite:///{temporary}/bank.db",
-            ml_model_directory=str(Path(artifacts).resolve()),
-            protocolguard_env="development",
-            require_postgres=False,
-            require_signed_client_ip=False,
-            serve_frontends=False,
-            block_threshold=60,
-            auto_block_enabled=True,
-            ip_auto_restrict_enabled=False,
-            ml_enabled=True,
-            risk_fsm_weight=0.30,
-            risk_rf_weight=0.35,
-            risk_if_weight=0.10,
-            risk_behavior_weight=0.25,
-            risk_window_seconds=60,
-            risk_half_life_seconds=600,
-        )
-        app = create_app(config)
-        with (
-            patch("app.database.store.datetime", ReplayDateTime),
-            patch.object(routes, "record", timed_record),
-        ):
+        app = acceptance_app(artifacts, temporary)
+        with controlled_clock() as clock, patch.object(routes, "record", timed_record):
             with TestClient(app, client=("192.0.2.60", 5000)) as bank:
-                seed(
-                    app.state.session_factory,
-                    "acceptance-bank-password",
-                    "acceptance-admin-password",
-                )
-                if app.state.ml_status != "ready":
-                    raise ValueError("Acceptance checks require ready saved models")
+                seed_acceptance_bank(app)
                 # Preserve a verified session to prove backend denial after enforcement.
                 bank.post(
                     "/api/auth/login",
@@ -148,6 +156,58 @@ def replay(artifacts, latency, gap, *, failed_logins=15, normal_retry=False):
                     }
 
 
+TRANSFER_TIMING_CASES = (
+    ((7, 7, 7, 7, 7, 7), False),
+    ((3, 8, 5, 11, 4, 9), True),
+    ((10, 10, 10, 10, 10, 10), False),
+)
+
+
+def replay_transfers(artifacts, gaps, *, view_balance):
+    with TemporaryDirectory(prefix="protocolguard-ml-transfers-") as temporary:
+        app = acceptance_app(artifacts, temporary)
+        with controlled_clock() as clock, TestClient(app) as bank:
+            seed_acceptance_bank(app)
+            login = bank.post(
+                "/api/auth/login",
+                json={"username": "demo02", "password": "acceptance-bank-password"},
+            )
+            login.raise_for_status()
+            headers = {"X-CSRF-Token": login.json()["csrf_token"]}
+            clock["seconds"] = 0.0
+            statuses = []
+            for gap in gaps:
+                clock["seconds"] += gap
+                if view_balance:
+                    bank.get("/api/bank/balance").raise_for_status()
+                    clock["seconds"] += 0.01
+                status = bank.post(
+                    "/api/bank/transfer-request",
+                    headers=headers,
+                    json={"recipient": "Demo recipient", "amount_cents": 100},
+                ).status_code
+                statuses.append(status)
+                if status == 403:
+                    break
+                if status != 200:
+                    raise ValueError(f"Unexpected transfer response: {status}")
+            protected_status = bank.get("/api/bank/balance").status_code
+            with app.state.session_factory() as db:
+                user = db.scalar(select(User).where(User.username == "demo02"))
+                block = db.scalar(select(BlockedEntity).where(BlockedEntity.user_id == user.id))
+                alert = db.scalar(select(SecurityAlert).where(SecurityAlert.user_id == user.id))
+                return {
+                    "gaps_seconds": gaps,
+                    "view_balance_between_transfers": view_balance,
+                    "transfer_statuses": statuses,
+                    "elapsed_seconds": clock["seconds"],
+                    "blocked": user.blocked,
+                    "block_source": block.source if block else None,
+                    "alert_recorded": alert is not None,
+                    "protected_status": protected_status,
+                }
+
+
 def validate(artifacts):
     attacks = [replay(artifacts, latency, gap) for latency, gap in TIMING_CASES]
     controls = [
@@ -171,11 +231,32 @@ def validate(artifacts):
         and row["unrelated_account_unchanged"]
         for row in controls
     )
-    passed = passed and not paced["blocked"]
+    transfers = [
+        replay_transfers(artifacts, gaps, view_balance=view_balance)
+        for gaps, view_balance in TRANSFER_TIMING_CASES
+    ]
+    normal_transfers = [
+        replay_transfers(artifacts, gaps[:3], view_balance=view_balance)
+        for gaps, view_balance in TRANSFER_TIMING_CASES
+    ]
+    passed = passed and not paced["blocked"] and all(
+        row["blocked"]
+        and row["block_source"] == "automatic"
+        and row["alert_recorded"]
+        and row["transfer_statuses"][-1] == 403
+        and row["protected_status"] == 403
+        for row in transfers
+    ) and all(
+        not row["blocked"]
+        and row["transfer_statuses"] == [200, 200, 200]
+        and row["protected_status"] == 200
+        for row in normal_transfers
+    )
     return {
         "passed": passed,
         "threshold": 60,
-        "risk_policy_unchanged": True,
+        "paced_transfer_cases": transfers,
+        "normal_transfer_controls": normal_transfers,
         "scope": "isolated ASGI replay with controlled timestamps; not a live-network timing guarantee",
         "attack_cases": attacks,
         "normal_retry_controls": controls,
@@ -199,6 +280,8 @@ def main():
                 "passed": report["passed"],
                 "attack_cases": len(report["attack_cases"]),
                 "normal_retry_controls": len(report["normal_retry_controls"]),
+                "paced_transfer_cases": len(report["paced_transfer_cases"]),
+                "normal_transfer_controls": len(report["normal_transfer_controls"]),
                 "threshold": 60,
             }
         )

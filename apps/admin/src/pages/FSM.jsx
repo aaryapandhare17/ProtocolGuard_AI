@@ -23,7 +23,8 @@ import FSMGraph from "../components/FSMGraph";
 function ReplayWorkspace({ definition, live }) {
   const sessions = useResource("/admin/fsm/sessions", live.revision);
   const [params, setParams] = useSearchParams(),
-    sessionId = params.get("session") || "";
+    sessionId = params.get("session") || "",
+    eventId = params.get("event");
   const [report, setReport] = useState(null),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(false),
@@ -44,7 +45,11 @@ function ReplayWorkspace({ definition, live }) {
         signal: controller.signal,
       })
         .then((data) => {
+          const triggerPosition = data.persisted_events.findIndex(
+            (event) => String(event.id) === eventId,
+          ) + 1;
           setReport(data);
+          setPosition(triggerPosition);
           setLoading(false);
         })
         .catch((err) => {
@@ -54,7 +59,7 @@ function ReplayWorkspace({ definition, live }) {
           }
         });
     return () => controller.abort();
-  }, [sessionId, nonce]);
+  }, [sessionId, eventId, nonce]);
   useEffect(() => {
     if (!playing || !report) return;
     if (position >= report.transitions.length) {
@@ -290,6 +295,12 @@ function ReplayWorkspace({ definition, live }) {
                 </Link>
               )}
             </SectionHeader>
+            {eventId &&
+              !report.persisted_events.some((event) => String(event.id) === eventId) && (
+                <p className="muted" role="status">
+                  The alert event is unavailable in this recorded session.
+                </p>
+              )}
             <div className="table-scroll">
               <table className="replay-table">
                 <thead>
@@ -313,6 +324,7 @@ function ReplayWorkspace({ definition, live }) {
                         <button
                           className="button small secondary"
                           aria-label={`Replay through transition ${index + 1}`}
+                          aria-current={position === index + 1 ? "step" : undefined}
                           onClick={() => move(index + 1)}
                         >
                           {index + 1}
@@ -324,7 +336,12 @@ function ReplayWorkspace({ definition, live }) {
                       <td className="mono">
                         {row.state_before} → {row.state_after}
                       </td>
-                      <td className="event-name">{row.event}</td>
+                      <td className="event-name">
+                        {row.event}
+                        {String(report.persisted_events[index].id) === eventId && (
+                          <p className="muted">Alert trigger</p>
+                        )}
+                      </td>
                       <td>
                         <Badge value={row.valid ? "low" : "high"}>
                           {row.valid ? "Valid" : "Invalid"}

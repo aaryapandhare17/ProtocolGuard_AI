@@ -4,7 +4,10 @@ pytest.importorskip("sklearn")
 from fastapi.testclient import TestClient
 from app.ml.dataset import build_dataset
 from app.ml.train import train_models
-from app.ml.validate_live import replay, TIMING_CASES
+from app.ml.synthetic import GENERATOR_VERSION
+from app.ml.validate_live import (
+    replay, replay_transfers, TIMING_CASES, TRANSFER_TIMING_CASES,
+)
 from app.main import create_app
 from app.core.config import Settings
 from test_blocking import admin_login
@@ -58,5 +61,20 @@ def test_projected_model_metadata_remains_available_to_admin(release_models, tmp
         assert response.json()["status"] == "available", response.json()
         assert (
             response.json()["report"]["dataset"]["generator_version"]
-            == "bank-synthetic-v2"
+            == GENERATOR_VERSION
         )
+
+
+@pytest.mark.parametrize("gaps,view_balance", TRANSFER_TIMING_CASES)
+def test_paced_transfers_are_blocked_and_normal_transfers_keep_access(
+    release_models, gaps, view_balance
+):
+    result = replay_transfers(release_models, gaps, view_balance=view_balance)
+    assert result["blocked"] and result["block_source"] == "automatic"
+    assert result["alert_recorded"] and result["protected_status"] == 403
+    assert result["transfer_statuses"][-1] == 403 and result["elapsed_seconds"] <= 60
+
+    control = replay_transfers(release_models, gaps[:3], view_balance=view_balance)
+    assert not control["blocked"]
+    assert control["transfer_statuses"] == [200, 200, 200]
+    assert control["protected_status"] == 200

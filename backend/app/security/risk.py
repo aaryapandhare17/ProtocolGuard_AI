@@ -2,7 +2,7 @@
 from dataclasses import asdict, dataclass
 import math
 
-POLICY_VERSION = "hybrid-risk-v1"
+POLICY_VERSION = "hybrid-risk-v2"
 
 
 @dataclass(frozen=True)
@@ -68,7 +68,7 @@ def behavioral_evidence(rows):
     rate = requests/max(duration, 1)
     factors = {
         "failed_logins": min(1, max(0, failures-2)/6),
-        "transfer_requests": min(1, max(0, transfers-3)/12),
+        "transfer_requests": min(1, max(0, transfers-3)/2),
         "unauthorized_requests": min(1, unauthorized/3),
         "request_burst": min(1, max(0, rate-5)/20) if requests >= 10 else 0,
         "rate_limit": float(any(row.event_type == "RATE_LIMIT_TRIGGERED" for row in rows)),

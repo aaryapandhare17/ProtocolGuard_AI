@@ -10,15 +10,15 @@ From the repository root, with the backend environment activated:
 
 ```sh
 python -m pip install -e "backend[dev,ml]"
-python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v2
-python -m app.ml.train --dataset ml/datasets/bank-v2 --output ml/artifacts/bank-v2
-python -m app.ml.compare --dataset ml/datasets/bank-v2 --artifacts ml/artifacts/bank-v2 --output ml/evaluation/comparison-v2.json
+python -m app.ml.dataset --sessions 10000 --seed 42 --output ml/datasets/bank-v3
+python -m app.ml.train --dataset ml/datasets/bank-v3 --output ml/artifacts/bank-v3
+python -m app.ml.compare --dataset ml/datasets/bank-v3 --artifacts ml/artifacts/bank-v3 --output ml/evaluation/comparison-v3.json
 ```
 
 Skip generation/training when those outputs already exist. Commands refuse to overwrite;
 choose new paths for repeat runs. The API reads the training report from
 `ML_MODEL_DIRECTORY/evaluation.json` and comparison from `ML_COMPARISON_REPORT`, whose
-default is `ml/evaluation/comparison-v2.json`. Restart the backend after changing model
+default is `ml/evaluation/comparison-v3.json`. Restart the backend after changing model
 artifacts so runtime inference and saved metadata agree.
 
 Reproducible source is committed; generated dataset/model files remain ignored. The executed
@@ -123,4 +123,4 @@ consistency, and histogram endpoint/empty/constant cases. Browser checks cover m
 partition/scope changes, live history, four-detector charts, unavailable-state behavior,
 policy mismatch and restoration, and mobile layout without root horizontal overflow.
 
-Current v2 reports and the same-cohort baseline audit are linked in [the login timing release](login-model-v2.md). Earlier report JSON files remain archived.
+Historical v2 reports and the same-cohort baseline audit are linked in [the login timing release](login-model-v2.md). Earlier report JSON files remain archived.

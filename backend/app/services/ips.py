@@ -113,7 +113,7 @@ def observe_event(db,request,event):
     config=request.app.state.settings
     if config.ip_auto_restrict_enabled and evidence['unauthenticated_events']>=config.ip_abuse_threshold:
         block_ip(db,ip,reason='Repeated unauthenticated abuse exceeded the IP limit',source='automatic',
-            evidence=evidence,duration_seconds=config.ip_restriction_seconds)
+            evidence={**evidence, "event_id": event.id},duration_seconds=config.ip_restriction_seconds)
 
 
 def serialize_alert(db,row):

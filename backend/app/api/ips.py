@@ -6,6 +6,7 @@ from app.api.routes import admin_identity,database
 from app.api.blocking import ConfirmedAction
 from app.models.entities import IPAccount,IPRestriction,IPSecurityAlert,SecurityEvent,SuspiciousIP
 from app.security.ip import canonical_ip,connection_ip
+from app.services.replay import attach_alert_replays
 from app.services.ips import (active_restriction,block_ip,ensure_ip,recent_evidence,serialize_alert,unblock_ip)
 
 router=APIRouter(prefix='/api/admin')
@@ -79,4 +80,5 @@ def unblock(data:IPAction,auth=Depends(admin_identity),db=Depends(database)):
 
 @router.get('/ip-alerts')
 def alerts(limit:int=Query(50,ge=1,le=200),auth=Depends(admin_identity),db=Depends(database)):
-    return [serialize_alert(db,row) for row in db.scalars(select(IPSecurityAlert).order_by(IPSecurityAlert.id.desc()).limit(limit))]
+    rows = db.scalars(select(IPSecurityAlert).order_by(IPSecurityAlert.id.desc()).limit(limit))
+    return attach_alert_replays(db, [serialize_alert(db, row) for row in rows])

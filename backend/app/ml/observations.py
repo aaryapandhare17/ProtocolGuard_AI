@@ -26,7 +26,7 @@ def prefix_label(scenario, source_label, events):
         return int(kinds.count("LOGIN_FAILED") >= 3)
     if scenario == "rapid_requests":
         return int(sum(kind in {"VIEW_BALANCE", "VIEW_HISTORY"} for kind in kinds) >= 10)
-    if scenario in {"transfer_burst", "heldout_paced_transfer"}:
+    if scenario in {"transfer_burst", "transfer_paced", "heldout_paced_transfer"}:
         return int(kinds.count("TRANSFER_REQUEST") >= 4)
     if scenario == "unauthorized_access":
         return int("UNAUTHORIZED_REQUEST" in kinds)
